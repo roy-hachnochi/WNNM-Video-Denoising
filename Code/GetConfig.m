@@ -23,7 +23,7 @@ sConfig.sBlockMatching.Innerloop =   2;                                    % Inn
 sConfig.sBlockMatching.ReWeiIter =   3;
 sConfig.sBlockMatching.patchSize =   6;                            % Patch size
 sConfig.sBlockMatching.patnum        =   70;                           % Initial Non-local Patch number
-sConfig.sBlockMatching.Iter          =   8;                            % total iter numbers
+sConfig.sBlockMatching.nIter          =   8;                            % total iter numbers
 sConfig.sBlockMatching.lamada        =   0.54;                         % Noise estimete parameter
 sConfig.sBlockMatching.step      =   floor(sConfig.sBlockMatching.patchSize - 1); 
 

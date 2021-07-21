@@ -1,0 +1,38 @@
+function mY = WNNVD(mX, sConfig)
+% --------------------------------------------------------------------------------------------------------- %
+% Weighted Nuclear Norm Video Denoiser.
+%
+% Input:
+%   mX -      4D array of noised video frames. [h, w, f]
+%   sConfig - Struct containing all parameters for algorithm.
+%
+% Output:
+%   mY - 4D array of denoised video frames. [h, w, f]
+% --------------------------------------------------------------------------------------------------------- %
+
+[h, w, f] = size(mX);
+
+%% Pre-denoising for block matching
+mPreDenoised = zeros(size(mX));
+for frame = 1:f
+    mPreDenoised(:,:,frame) = PreProcessFrame(mX(:,:,frame));
+end
+
+%% Perform WNNVD for a single reference frame
+% TODO: wrap with while/for - for different refernce frames...
+[mY, vNumUngrouped] = WNNVDRefFrame(mX, ceil(f/2), sConfig);
+
+% TODO: for patch extraction, decide between the following options:
+% 1) Extract patches in advance. Pros: everything is prepared, much more convinient, less calculations,
+%                                      allows us to perform block matching not every iteration.
+%                                Cons: space consuming - saving many overlapping segments of video.
+% 2) Extract patches during alg. Pros: no memory required.
+%                                Cons: Less convinient to handle, many repeating calculations (runtime).
+
+% TODO: decide if we want to process frame-by-frame (high computational cost) or make it smarter and process
+% patches based on a single frame, hold an array telling us which pixels have been processed, and then
+% process again based on patches containing the pixels which weren't processed...
+
+% TODO: how can we save time by performing block matching not every iteration, but every X iterations?
+
+end
