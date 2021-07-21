@@ -1,6 +1,6 @@
 function mDenoised = PreprocessFrame(mNoised)
 % --------------------------------------------------------------------------------------------------------- %
-% Simple denoiser a single image by median filtering -> gaussian filtering.
+% Simple denoiser for a single image by median filtering -> gaussian filtering.
 %
 % Input:
 %   mNoised - Noised image. [h, w]
