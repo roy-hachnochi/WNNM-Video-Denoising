@@ -1,4 +1,4 @@
-function [mY, vNumUngroupedPixels] = DenoisePatches(mX, mGroupIndices, vNumNeighbors)
+function [mY, mUngroupedPixels] = DenoisePatches(mX, mGroupIndices, vNumNeighbors)
 % --------------------------------------------------------------------------------------------------------- %
 % Denoise each patch with WNNM and aggregate to form estimated image.
 %
@@ -8,8 +8,8 @@ function [mY, vNumUngroupedPixels] = DenoisePatches(mX, mGroupIndices, vNumNeigh
 %   vNumNeighbors - Array containing number of effective neighbors per reference patch. [N, 1]
 %
 % Output:
-%   mY -                  Denoised image. [h, w, f]
-%   vNumUngroupedPixels - Number of unprocessed pixels per frame. [1, f]
+%   mY -               Denoised image. [h, w, f]
+%   mUngroupedPixels - 3D boolean array stating which pixles in video have been processed. [h, w, f]
 % --------------------------------------------------------------------------------------------------------- %
 
 end

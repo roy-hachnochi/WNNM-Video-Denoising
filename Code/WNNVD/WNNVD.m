@@ -19,12 +19,11 @@ for frame = 1:f
 end
 
 %% Perform WNNVD for a single reference frame
-vNumUngroupedPixels = h*w*ones(1,f);
 mY = mX;
 for it = 1:1
     % TODO: wrap with while/for - for different refernce frames...
     % TODO: add frame selector
-    [mY, vNumUngroupedPixels] = WNNVDRefFrame(mY, mPreDenoised, ceil(f/2), vNumUngroupedPixels, sConfig);
+    [mY, mUngroupedPixels] = WNNVDRefFrame(mY, mPreDenoised, ceil(f/2), sConfig);
 end
 
 end

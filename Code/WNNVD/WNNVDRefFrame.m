@@ -1,4 +1,4 @@
-function [mY, vNumUngroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, refFrame, vNumUngroupedPixels, sConfig)
+function [mY, mUngroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, refFrame, sConfig)
 % --------------------------------------------------------------------------------------------------------- %
 % Weighted Nuclear Norm Video Denoiser based on a single reference frame.
 %
@@ -6,12 +6,11 @@ function [mY, vNumUngroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, refFrame, v
 %   mX -                  3D array of noised video frames. [h, w, f]
 %   mPreDenoised -        3D array of pre-denoised video frames. [h, w, f]
 %   refFrame -            Reference frame number for key-patches.
-%   vNumUngroupedPixels - Number of unprocessed pixels per frame. [1, f]
 %   sConfig -             Struct containing all parameters for algorithm.
 %
 % Output:
-%   mY -                  3D array of denoised video frames. [h, w, f]
-%   vNumUngroupedPixels - Updated number of unprocessed pixels per frame. [1, f]
+%   mY -               3D array of denoised video frames. [h, w, f]
+%   mUngroupedPixels - 3D boolean array stating which pixles in video have been processed. [h, w, f]
 % --------------------------------------------------------------------------------------------------------- %
 
 % TODO: fix all sConfig names
@@ -35,7 +34,7 @@ for iter = 1:sConfig.nIter
     end
     
     % WNNM per group and image aggregation:
-    [mY, vNumUngroupedPixels] = DenoisePatches(mY, mGroupIndices, vNumNeighbors);
+    [mY, mUngroupedPixels] = DenoisePatches(mY, mGroupIndices, vNumNeighbors);
 end
 
 end

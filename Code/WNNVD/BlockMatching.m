@@ -16,8 +16,8 @@ function [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds, refFr
 
 [~, ~, f] = size(mX);
 
-k = sConfig.maxNeighborsFrame;
-K = sConfig.maxGroupSize;
+k = sConfig.sBlockMatching.maxNeighborsFrame;
+K = sConfig.sBlockMatching.maxGroupSize;
 
 NRefPatches =   size(mRefPatchInds, 1);
 mGroupIndices = zeros(NRefPatches, K, 3);
@@ -80,7 +80,7 @@ function [mNearestInds, vNearestDists] = BlockMatchingNonPred(mX, vRefPatchInds,
 
 [h, w, ~] = size(mX);
 
-k = sConfig.maxNeighborsFrame;
+k = sConfig.sBlockMatching.maxNeighborsFrame;
 m = sConfig.sBlockMatching.searchWindowNP;
 s = sConfig.sBlockMatching.searchStrideNP;
 p = sConfig.sBlockMatching.patchSize;
@@ -93,8 +93,8 @@ refFrame = vRefPatchInds(3);
 mRefPatch = mX(refRow + (0:p-1), refCol + (0:p-1), refFrame);
 
 % calculate search window:
-vSearchRows = max(0, min(refRow + [flip(0:-s:-m), s:s:m], h - p + 1));
-vSearchCols = max(0, min(refCol + [flip(0:-s:-m), s:s:m], w - p + 1));
+vSearchRows = unique(max(0, min(refRow + [flip(0:-s:-m), s:s:m], h - p + 1)));
+vSearchCols = unique(max(0, min(refCol + [flip(0:-s:-m), s:s:m], w - p + 1)));
 [mSearchRows, mSearchCols] = meshgrid(vSearchRows, vSearchCols);
 mSearchInds = zeros(length(vSearchRows)*length(vSearchCols), 2);
 mSearchInds(:, 1) = mSearchRows(:);
@@ -132,7 +132,7 @@ function [mNearestInds, vNearestDists] = BlockMatchingPred(mX, vRefPatchInds, mP
 
 [h, w, ~] = size(mX);
 
-k = sConfig.maxNeighborsFrame;
+k = sConfig.sBlockMatching.maxNeighborsFrame;
 m = sConfig.sBlockMatching.searchWindowP;
 s = sConfig.sBlockMatching.searchStrideP;
 p = sConfig.sBlockMatching.patchSize;
@@ -147,8 +147,8 @@ mRefPatch = mX(refRow + (0:p-1), refCol + (0:p-1), refFrame);
 % calculate search windows:
 mSearchInds = [];
 for windNum = 1:size(mPrevNearestInds, 1)
-    vSearchRows = max(0, min(mPrevNearestInds(1) + [flip(0:-s:-m), s:s:m], h - p + 1));
-    vSearchCols = max(0, min(mPrevNearestInds(2) + [flip(0:-s:-m), s:s:m], w - p + 1));
+    vSearchRows = unique(max(0, min(mPrevNearestInds(1) + [flip(0:-s:-m), s:s:m], h - p + 1)));
+    vSearchCols = unique(max(0, min(mPrevNearestInds(2) + [flip(0:-s:-m), s:s:m], w - p + 1)));
     [mSearchRows, mSearchCols] = meshgrid(vSearchRows, vSearchCols);
     mCurSearchInds = zeros(length(vSearchRows)*length(vSearchCols), 2);
     mCurSearchInds(:, 1) = mSearchRows(:);
@@ -159,7 +159,7 @@ end
 % find dists:
 vDists = zeros(size(mSearchInds, 1), 1);
 for ind = 1:size(mSearchInds, 1)
-    mPatch = mX(mSearchInds(ind, 1) + (0:p-1), mSearchInds(ind, 2) + (0:p-1), refFrame);
+    mPatch = mX(mSearchInds(ind, 1) + (0:p-1), mSearchInds(ind, 2) + (0:p-1), iFrame);
     vDists(ind) = PatchDist(mRefPatch, mPatch, sConfig);
 end
 
