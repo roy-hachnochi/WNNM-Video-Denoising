@@ -23,7 +23,7 @@ mY = mX;
 for it = 1:1
     % TODO: wrap with while/for - for different refernce frames...
     % TODO: add frame selector
-    [mY, mUngroupedPixels] = WNNVDRefFrame(mY, mPreDenoised, ceil(f/2), sConfig);
+    [mY, mGroupedPixels] = WNNVDRefFrame(mY, mPreDenoised, ceil(f/2), sConfig);
 end
 
 end

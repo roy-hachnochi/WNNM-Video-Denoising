@@ -1,4 +1,4 @@
-function [mY, mUngroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, refFrame, sConfig)
+function [mY, mGroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, refFrame, sConfig)
 % --------------------------------------------------------------------------------------------------------- %
 % Weighted Nuclear Norm Video Denoiser based on a single reference frame.
 %
@@ -9,8 +9,8 @@ function [mY, mUngroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, refFrame, sCon
 %   sConfig -             Struct containing all parameters for algorithm.
 %
 % Output:
-%   mY -               3D array of denoised video frames. [h, w, f]
-%   mUngroupedPixels - 3D boolean array stating which pixles in video have been processed. [h, w, f]
+%   mY -             3D array of denoised video frames. [h, w, f]
+%   mGroupedPixels - 3D boolean array stating which pixles in video have been processed. [h, w, f]
 % --------------------------------------------------------------------------------------------------------- %
 
 % TODO: fix all sConfig names
@@ -23,7 +23,7 @@ mRefPatchInds = GetRefPatchInds(h, w, sConfig);
 %% Denoise per reference patch:
 mY = mX;
 for iter = 1:sConfig.nIter
-    mY = mY + sConfig.delta*(mX - mY);
+    mY = mY + sConfig.delta*(mX - mY); % TODO: in the paper they do this differently
     
     % Block matching:
     % We perfrom the block matching based on the pre-denoised video, but extract the patches themselves from
@@ -34,7 +34,7 @@ for iter = 1:sConfig.nIter
     end
     
     % WNNM per group and image aggregation:
-    [mY, mUngroupedPixels] = DenoisePatches(mY, mGroupIndices, vNumNeighbors);
+    [mY, mGroupedPixels] = DenoisePatches(mY, mGroupIndices, vNumNeighbors, sConfig);
 end
 
 end
