@@ -13,24 +13,32 @@ function [mY, mGroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, refFrame, sConfi
 %   mGroupedPixels - 3D boolean array stating which pixles in video have been processed. [h, w, f]
 % --------------------------------------------------------------------------------------------------------- %
 
-% TODO: fix all sConfig names
+% TODO: add waitbar (here or inside functions)
+% TODO: add PSNR (and other metrics) printing for each iteration?
+% TODO: save log with intermediate results for research (PSNR per it, amount of matched patches from each
+% frame, ...)?
 
-[h, w, f] = size(mX);
+[h, w, ~] = size(mX);
 
 %% Get reference patch indices:
 mRefPatchInds = GetRefPatchInds(h, w, sConfig);
 
 %% Denoise per reference patch:
 mY = mX;
-for iter = 1:sConfig.nIter
-    mY = mY + sConfig.delta*(mX - mY); % TODO: in the paper they do this differently
+for iter = 1:sConfig.sWNNM.nIter
+    mY = mY + sConfig.sWNNM.delta*(mX - mY); % TODO: in the paper they do this differently
     
     % Block matching:
     % We perfrom the block matching based on the pre-denoised video, but extract the patches themselves from
     % the noised version.
-    if (mod(iter - 1,sConfig.Innerloop) == 0)
-        sConfig.patnum = sConfig.patnum - 10; % TODO: do we need this? from original WNNM code
-        [mGroupIndices, vNumNeighbors] = BlockMatching(mPreDenoised, mRefPatchInds, refFrame, sConfig);
+    if (mod(iter - 1, sWNNM.BMIter) == 0)
+        sConfig.sBlockMatching.maxGroupSize = sConfig.sBlockMatching.maxGroupSize - 10; % TODO: do we need this? from original WNNM code
+        if (iter == 1)
+            mBMInput = mPreDenoised;
+        else
+            mBMInput = mY;
+        end
+        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig);
     end
     
     % WNNM per group and image aggregation:
