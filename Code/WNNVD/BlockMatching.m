@@ -1,4 +1,4 @@
-function [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds, refFrame, sConfig)
+function [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds, refFrame, sConfig, isWaitbar)
 % --------------------------------------------------------------------------------------------------------- %
 % Performs block matching per reference patch - find nearest (most similar) patches to each reference patches
 % in entire video.
@@ -8,11 +8,16 @@ function [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds, refFr
 %   mRefPatchInds - 2D array containing upper-left indices of reference patches. [N, 2]
 %   refFrame -      Reference frame number for key-patches.
 %   sConfig -       Struct containing all parameters for algorithm.
+%   isWaitbar -     (optional) Display waitbar (default: false).
 %
 % Output:
 %   mGroupIndices - 3D array containing upper-left indices of patches in group per reference patch. [N, K, 3]
 %   vNumNeighbors - Array containing number of effective neighbors per reference patch. [N, 1]
 % --------------------------------------------------------------------------------------------------------- %
+
+if ~exist('isWaitbar', 'var') || isempty(isWaitbar)
+    isWaitbar = false;
+end
 
 [~, ~, f] = size(mX);
 
@@ -23,6 +28,9 @@ NRefPatches =   size(mRefPatchInds, 1);
 mGroupIndices = zeros(NRefPatches, K, 3);
 vNumNeighbors = zeros(NRefPatches, 1);
 
+if isWaitbar
+    wb = waitbar(0, 'Performing Block-Matching');
+end
 for iRef = 1:NRefPatches
     %% Find nearest patches per frame
     mSearchPatchInds =  zeros(f*k, 3); % indices of most similar patches per frame
@@ -58,6 +66,13 @@ for iRef = 1:NRefPatches
     [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K);
     mGroupIndices(iRef, 1:K, :) = mSearchPatchInds(vNearestInds, :);
     vNumNeighbors(iRef) =         sum(vNearestDists <= sConfig.sBlockMatching.distTh);
+    
+    if isWaitbar && (mod(iRef - 1, 20) == 0)
+        waitbar(iRef/NRefPatches, wb);
+    end
+end
+if isWaitbar
+    close(wb);
 end
 
 end

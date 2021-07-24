@@ -19,7 +19,7 @@ if sInputConfig.isGray
 end
 
 mFrames = zeros([h, w, ch, f], 'single');
-for ind = 1:f
+for ind = 1:min(f, sInputConfig.maxFrames)
     if sInputConfig.isGray
         mFrames(:,:,1,ind) = single(rgb2gray(mOrigFrames(:,:,:,ind)))/255;
     else

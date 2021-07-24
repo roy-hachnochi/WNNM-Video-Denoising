@@ -38,7 +38,7 @@ for iter = 1:sConfig.sWNNM.nIter
         else
             mBMInput = mY;
         end
-        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig);
+        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, true);
     end
     
     % WNNM per group and image aggregation:

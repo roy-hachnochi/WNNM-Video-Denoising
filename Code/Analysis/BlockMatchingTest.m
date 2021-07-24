@@ -1,10 +1,10 @@
 % Test for BlockMatching function:
 
 %% Parameters:
-refFrame = 71;
+refFrame =        71;
 refPatchTestInd = 700;
-FACE_ALPHA = 0.3;
-nPatchesToPlot = 15;
+FACE_ALPHA =      0.3;
+nPatchesToPlot =  15;
 
 %% Initializations:
 sConfig = GetConfig();
