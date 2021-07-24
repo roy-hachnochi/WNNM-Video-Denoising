@@ -55,9 +55,9 @@ for iRef = 1:NRefPatches
     end
     
     %% Find nearest patches from entire patch array:
-    [vNearestInds, vNearestDists] = mink(vSearchPatchDists, K);
-    mGroupIndices(ind, :) = mSearchPatchInds(vNearestInds, :);
-    vNumNeighbors(ind) =    sum(vNearestDists <= sConfig.sBlockMatching.distTh);
+    [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K);
+    mGroupIndices(iRef, 1:K, :) = mSearchPatchInds(vNearestInds, :);
+    vNumNeighbors(iRef) =         sum(vNearestDists <= sConfig.sBlockMatching.distTh);
 end
 
 end
@@ -93,8 +93,8 @@ refFrame = vRefPatchInds(3);
 mRefPatch = mX(refRow + (0:p-1), refCol + (0:p-1), refFrame);
 
 % calculate search window:
-vSearchRows = unique(max(0, min(refRow + [flip(0:-s:-m), s:s:m], h - p + 1)));
-vSearchCols = unique(max(0, min(refCol + [flip(0:-s:-m), s:s:m], w - p + 1)));
+vSearchRows = unique(max(1, min(refRow + [flip(0:-s:-m), s:s:m], h - p + 1)));
+vSearchCols = unique(max(1, min(refCol + [flip(0:-s:-m), s:s:m], w - p + 1)));
 [mSearchRows, mSearchCols] = meshgrid(vSearchRows, vSearchCols);
 mSearchInds = zeros(length(vSearchRows)*length(vSearchCols), 2);
 mSearchInds(:, 1) = mSearchRows(:);
@@ -108,7 +108,7 @@ for ind = 1:size(mSearchInds, 1)
 end
 
 % get nearest patches:
-[vNearestInds, vNearestDists] = mink(vDists, k);
+[vNearestDists, vNearestInds] = mink(vDists, k);
 mNearestInds = [mSearchInds(vNearestInds, :), repmat(refFrame, [k, 1])];
 
 end
@@ -147,8 +147,8 @@ mRefPatch = mX(refRow + (0:p-1), refCol + (0:p-1), refFrame);
 % calculate search windows:
 mSearchInds = [];
 for windNum = 1:size(mPrevNearestInds, 1)
-    vSearchRows = unique(max(0, min(mPrevNearestInds(1) + [flip(0:-s:-m), s:s:m], h - p + 1)));
-    vSearchCols = unique(max(0, min(mPrevNearestInds(2) + [flip(0:-s:-m), s:s:m], w - p + 1)));
+    vSearchRows = unique(max(1, min(mPrevNearestInds(1) + [flip(0:-s:-m), s:s:m], h - p + 1)));
+    vSearchCols = unique(max(1, min(mPrevNearestInds(2) + [flip(0:-s:-m), s:s:m], w - p + 1)));
     [mSearchRows, mSearchCols] = meshgrid(vSearchRows, vSearchCols);
     mCurSearchInds = zeros(length(vSearchRows)*length(vSearchCols), 2);
     mCurSearchInds(:, 1) = mSearchRows(:);
@@ -164,7 +164,7 @@ for ind = 1:size(mSearchInds, 1)
 end
 
 % get nearest patches:
-[vNearestInds, vNearestDists] = mink(vDists, k);
+[vNearestDists, vNearestInds] = mink(vDists, k);
 mNearestInds = [mSearchInds(vNearestInds, :), repmat(iFrame, [k, 1])];
 
 end

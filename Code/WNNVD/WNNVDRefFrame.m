@@ -31,7 +31,7 @@ for iter = 1:sConfig.sWNNM.nIter
     % Block matching:
     % We perfrom the block matching based on the pre-denoised video, but extract the patches themselves from
     % the noised version.
-    if (mod(iter - 1, sWNNM.BMIter) == 0)
+    if (mod(iter - 1, sConfig.sWNNM.BMIter) == 0)
         sConfig.sBlockMatching.maxGroupSize = sConfig.sBlockMatching.maxGroupSize - 10; % TODO: do we need this? from original WNNM code
         if (iter == 1)
             mBMInput = mPreDenoised;

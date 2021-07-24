@@ -15,7 +15,7 @@ function mY = WNNVD(mX, sConfig)
 %% Pre-denoising for block matching
 mPreDenoised = zeros(size(mX));
 for frame = 1:f
-    mPreDenoised(:,:,frame) = PreProcessFrame(mX(:,:,frame));
+    mPreDenoised(:,:,frame) = PreprocessFrame(mX(:,:,frame));
 end
 
 %% Perform WNNVD for a single reference frame
