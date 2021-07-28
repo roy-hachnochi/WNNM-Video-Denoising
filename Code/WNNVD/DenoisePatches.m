@@ -1,4 +1,4 @@
-function [mY, mGroupedPixels] = DenoisePatches(mX, mGroupIndices, vNumNeighbors, sConfig)
+function [mY, mGroupedPixels] = DenoisePatches(mX, mGroupIndices, vNumNeighbors, sConfig, isWaitbar)
 % --------------------------------------------------------------------------------------------------------- %
 % Denoise each patch with WNNM and aggregate to form estimated image.
 %
@@ -7,20 +7,28 @@ function [mY, mGroupedPixels] = DenoisePatches(mX, mGroupIndices, vNumNeighbors,
 %   mGroupIndices - 3D array containing upper-left indices of patches in group per reference patch. [N, K, 3]
 %   vNumNeighbors - Array containing number of effective neighbors per reference patch. [N, 1]
 %   sConfig -       Struct containing all parameters for algorithm.
+%   isWaitbar -     (optional) Display waitbar (default: false).
 %
 % Output:
 %   mY -             Denoised image. [h, w, f]
 %   mGroupedPixels - 3D boolean array stating which pixles in video have been processed. [h, w, f]
 % --------------------------------------------------------------------------------------------------------- %
 
+if ~exist('isWaitbar', 'var') || isempty(isWaitbar)
+    isWaitbar = false;
+end
+
 p = sConfig.sBlockMatching.patchSize;
 
 mPreAgg =     zeros(size(mX)); % sum of all (possibly overlapping) denoised patches, for aggregation.
 mPixelCount = zeros(size(mX)); % counter for number of times each pixel was part of a group, for aggregation
 
+if isWaitbar
+    wb = waitbar(0, 'Denoising Patches');
+end
 for iGroup = 1:size(mGroupIndices, 1)
     % Extract current patch group:
-    mCurGroupIndices = mGroupIndices(iGroup, 1:vNumNeighbors(iGroup), :);
+    mCurGroupIndices = squeeze(mGroupIndices(iGroup, 1:vNumNeighbors(iGroup), :));
     mGroup = ExtractGroup(mX, mCurGroupIndices, p);
     
     % Denoise using WNNM:
@@ -28,10 +36,18 @@ for iGroup = 1:size(mGroupIndices, 1)
     
     % Aggregate:
     [mPreAgg, mPixelCount] = Aggregate(mPreAgg, mPixelCount, mGroupDenoised, mCurGroupIndices, p);
+    
+    if isWaitbar && (mod(iGroup - 1, 20) == 0)
+        waitbar(iGroup/size(mGroupIndices, 1), wb);
+    end
+end
+if isWaitbar
+    close(wb);
 end
 
 mGroupedPixels = (mPixelCount > 0);
-mY = mPreAgg(mGroupedPixels)./mPixelCount(mGroupedPixels);
+mY = mX;
+mY(mGroupedPixels) = mPreAgg(mGroupedPixels)./mPixelCount(mGroupedPixels);
 
 end
 
@@ -52,9 +68,9 @@ function mGroup = ExtractGroup(mX, mGroupIndices, p)
 K = size(mGroupIndices, 1);
 mGroup = zeros(K, p^2);
 for iPatch = 1:K
-    row =   mGroupIndices(1);
-    col =   mGroupIndices(2);
-    frame = mGroupIndices(3);
+    row =   mGroupIndices(iPatch, 1);
+    col =   mGroupIndices(iPatch, 2);
+    frame = mGroupIndices(iPatch, 3);
     mGroup(iPatch, :) = reshape(mX(row + (0:(p-1)), col + (0:(p-1)), frame), [1, p^2]);
 end
 
@@ -79,9 +95,9 @@ function [mY, mCount] = Aggregate(mY, mCount, mGroup, mGroupIndices, p)
 
 K = size(mGroupIndices, 1);
 for iPatch = 1:K
-    row =   mGroupIndices(1);
-    col =   mGroupIndices(2);
-    frame = mGroupIndices(3);
+    row =   mGroupIndices(iPatch, 1);
+    col =   mGroupIndices(iPatch, 2);
+    frame = mGroupIndices(iPatch, 3);
     mY(row + (0:(p-1)), col + (0:(p-1)), frame) = mY(row + (0:(p-1)), col + (0:(p-1)), frame) + ...
         reshape(mGroup(iPatch, :), [p, p]);
     mCount(row + (0:(p-1)), col + (0:(p-1)), frame) = mCount(row + (0:(p-1)), col + (0:(p-1)), frame) + 1;

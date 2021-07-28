@@ -1,7 +1,7 @@
 % Test for BlockMatching function:
 
 %% Parameters:
-refFrame =        71;
+refFrame =        30;
 refPatchTestInd = 700;
 FACE_ALPHA =      0.3;
 nPatchesToPlot =  15;
@@ -41,9 +41,9 @@ title(['Number of Matched Patches Per Frame',newline,'Reference Frame: ',num2str
 % Plot the patches themselves:
 figure;
 for iPatch = 1:nPatchesToPlot
-    row =   mGroupIndices(1);
-    col =   mGroupIndices(2);
-    frame = mGroupIndices(3);
+    row =   mGroupIndices(1, iPatch, 1);
+    col =   mGroupIndices(1, iPatch, 2);
+    frame = mGroupIndices(1, iPatch, 3);
     subplot(ceil(nPatchesToPlot/5), 5, iPatch);
     imshow(mX(row + (0:(p-1)), col + (0:(p-1)), frame));
 end

@@ -5,7 +5,7 @@ function sConfig = GetConfig()
 
 %% Test video:
 sConfig.sInput.videoPath = 'xylophone.mp4';     % Video path for testing
-sConfig.sInput.maxFrames = 50;                  % Maximal number of frames (for runtime considerations)
+sConfig.sInput.maxFrames = 10;                  % Maximal number of frames (for runtime considerations)
 sConfig.sInput.isGray =    true;                % Use grayscale video or RGB
 
 assert(sConfig.sInput.isGray, "TODO: TEMP! implement solution for RGB by working on luminance space");

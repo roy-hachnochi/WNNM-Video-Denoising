@@ -11,12 +11,13 @@ function mB = WNNM(mA, sConfig)
 %   mB - Output array after WNNM (soft-weight-thresholding). [m, n]
 % --------------------------------------------------------------------------------------------------------- %
 
-mMean =        repmat(mean(mA, 2), [1, sConfig.sBlockMatching.patchSize]);
+mMean =        repmat(mean(mA, 2), [1, size(mA, 2)]);
 [mU, mS, mV] = svd(mA - mMean, 'econ');
 vSingVals =    diag(mS);
 vW =           CalcWeights(vSingVals, sConfig);
 vSingValsB =   max(vSingVals - vW,0);
-mB =           mU * diag(vSingValsB) * mV;
+vNonZeroInds = (vSingValsB > 0);
+mB =           mU(:,vNonZeroInds) * diag(vSingValsB(vNonZeroInds)) * mV(:,vNonZeroInds)';
 mB =           mB + mMean;
 
 end
@@ -36,7 +37,7 @@ function vW = CalcWeights(vSingVals, sConfig)
 
 C = sConfig.sWNNM.C;
 k = length(vSingVals);
-noiseSigma = sConfig.sNoise.sigma; % TODO: we need to estimate std for each iteration (only on first it's this)
-vW = C*sqrt(k)/(sqrt(vSingVals.^2 - k*noiseSigma^2) + 1e-16);
+noiseSigma = sConfig.sNoise.sigma/255; % TODO: we need to estimate std for each iteration (only on first it's this)
+vW = C*sqrt(k)./(sqrt(max(vSingVals.^2 - k*noiseSigma^2, 0)) + 1e-16);
 
 end

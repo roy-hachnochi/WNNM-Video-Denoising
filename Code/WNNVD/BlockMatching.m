@@ -160,16 +160,19 @@ refFrame = vRefPatchInds(3);
 mRefPatch = mX(refRow + (0:p-1), refCol + (0:p-1), refFrame);
 
 % calculate search windows:
+% TODO: changing mSearchInds size every loop iteration may be inefficient - think of an elegant way to
+% improve this
 mSearchInds = [];
 for windNum = 1:size(mPrevNearestInds, 1)
-    vSearchRows = unique(max(1, min(mPrevNearestInds(1) + [flip(0:-s:-m), s:s:m], h - p + 1)));
-    vSearchCols = unique(max(1, min(mPrevNearestInds(2) + [flip(0:-s:-m), s:s:m], w - p + 1)));
+    vSearchRows = unique(max(1, min(mPrevNearestInds(windNum, 1) + [flip(0:-s:-m), s:s:m], h - p + 1)));
+    vSearchCols = unique(max(1, min(mPrevNearestInds(windNum, 2) + [flip(0:-s:-m), s:s:m], w - p + 1)));
     [mSearchRows, mSearchCols] = meshgrid(vSearchRows, vSearchCols);
     mCurSearchInds = zeros(length(vSearchRows)*length(vSearchCols), 2);
     mCurSearchInds(:, 1) = mSearchRows(:);
     mCurSearchInds(:, 2) = mSearchCols(:);
     mSearchInds = [mSearchInds; mCurSearchInds]; %#ok
 end
+mSearchInds = unique(mSearchInds, 'rows'); % there could be repeating patches from different windows
 
 % find dists:
 vDists = zeros(size(mSearchInds, 1), 1);
