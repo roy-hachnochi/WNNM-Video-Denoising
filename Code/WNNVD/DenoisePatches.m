@@ -1,9 +1,10 @@
-function [mY, mGroupedPixels] = DenoisePatches(mX, mGroupIndices, vNumNeighbors, sConfig, isWaitbar)
+function [mY, mGroupedPixels] = DenoisePatches(mX, mNoised, mGroupIndices, vNumNeighbors, sConfig, isWaitbar)
 % --------------------------------------------------------------------------------------------------------- %
 % Denoise each patch with WNNM and aggregate to form estimated image.
 %
 % Input:
 %   mX -            3D array of noised video frames. [h, w, f]
+%   mNoised -       3D array of original noised video frames. [h, w, f]
 %   mGroupIndices - 3D array containing upper-left indices of patches in group per reference patch. [N, K, 3]
 %   vNumNeighbors - Array containing number of effective neighbors per reference patch. [N, 1]
 %   sConfig -       Struct containing all parameters for algorithm.
@@ -19,6 +20,7 @@ if ~exist('isWaitbar', 'var') || isempty(isWaitbar)
 end
 
 p = sConfig.sBlockMatching.patchSize;
+noiseSigma = sConfig.sNoise.sigma; % TODO: also take in consideration S&P and Poisson noises
 
 mPreAgg =     zeros(size(mX)); % sum of all (possibly overlapping) denoised patches, for aggregation.
 mPixelCount = zeros(size(mX)); % counter for number of times each pixel was part of a group, for aggregation
@@ -29,10 +31,10 @@ end
 for iGroup = 1:size(mGroupIndices, 1)
     % Extract current patch group:
     mCurGroupIndices = squeeze(mGroupIndices(iGroup, 1:vNumNeighbors(iGroup), :));
-    mGroup = ExtractGroup(mX, mCurGroupIndices, p);
+    [mGroup, noiseSigmaEst] = ExtractGroup(mX, mNoised, mCurGroupIndices, p, noiseSigma);
     
     % Denoise using WNNM:
-    mGroupDenoised = WNNM(mGroup, sConfig);
+    mGroupDenoised = WNNM(mGroup, noiseSigmaEst, sConfig);
     
     % Aggregate:
     [mPreAgg, mPixelCount] = Aggregate(mPreAgg, mPixelCount, mGroupDenoised, mCurGroupIndices, p);
@@ -52,17 +54,20 @@ mY(mGroupedPixels) = mPreAgg(mGroupedPixels)./mPixelCount(mGroupedPixels);
 end
 
 %% ==========================================================================================================
-function mGroup = ExtractGroup(mX, mGroupIndices, p)
+function [mGroup, noiseSigmaEst] = ExtractGroup(mX, mNoised, mGroupIndices, p, noiseSigma)
 % --------------------------------------------------------------------------------------------------------- %
 % Extracts group of patches from video.
 %
 % Input:
 %   mX -            3D array of video frames. [h, w, f]
+%   mNoised -       3D array of original noised video frames. [h, w, f]
 %   mGroupIndices - 2D array containing upper-left indices of patches in group. [K, 3]
 %   p -             Patch size (single dimension).
+%   noiseSigma -    Original noise STD of video.
 %
 % Output:
-%   mGroup - 2D array containing vecotrized patches in group. [K, p^2]
+%   mGroup -        2D array containing vecotrized patches in group. [K, p^2]
+%   noiseSigmaEst - Estimated noise STD for reference patch.
 % --------------------------------------------------------------------------------------------------------- %
 
 K = size(mGroupIndices, 1);
@@ -72,6 +77,12 @@ for iPatch = 1:K
     col =   mGroupIndices(iPatch, 2);
     frame = mGroupIndices(iPatch, 3);
     mGroup(iPatch, :) = reshape(mX(row + (0:(p-1)), col + (0:(p-1)), frame), [1, p^2]);
+    
+    % estimate noise based on first (reference) patch:
+    if (iPatch == 1)
+        vNoisedPatch = reshape(mNoised(row + (0:(p-1)), col + (0:(p-1)), frame), [1, p^2]);
+        noiseSigmaEst = sqrt(abs(mean((mGroup(1, :) - vNoisedPatch).^2) - noiseSigma^2));
+    end
 end
 
 end
