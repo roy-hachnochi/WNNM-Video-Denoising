@@ -30,7 +30,7 @@ if isWaitbar
 end
 for iGroup = 1:size(mGroupIndices, 1)
     % Extract current patch group:
-    mCurGroupIndices = squeeze(mGroupIndices(iGroup, 1:vNumNeighbors(iGroup), :));
+    mCurGroupIndices = reshape(mGroupIndices(iGroup, 1:vNumNeighbors(iGroup), :), [vNumNeighbors(iGroup),3]);
     [mGroup, noiseSigmaEst] = ExtractGroup(mX, mNoised, mCurGroupIndices, p, noiseSigma);
     
     % Denoise using WNNM:

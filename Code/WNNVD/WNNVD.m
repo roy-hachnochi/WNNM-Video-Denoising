@@ -23,12 +23,12 @@ mY =             mX;
 mGroupedPixels = false(size(mX));
 nextRefFrame =   ceil(f/2);
 iter =           1;
-while (iter <= sConfig.sWNNM.nFrameIter) && (mean(mGroupedPixels(:))*100 > sConfig.sWNNM.maxUngrouped)
+while (iter <= sConfig.sWNNM.nFrameIter) && (mean(~mGroupedPixels(:))*100 > sConfig.sWNNM.maxUngrouped)
     [mY, mGroupedPixels] = WNNVDRefFrame(mY, mPreDenoised, mGroupedPixels, nextRefFrame, sConfig);
     
     % choose next reference frame based on the one with most ungrouped pixels:
     vNumGrouped = squeeze(sum(mGroupedPixels, [1, 2]));
-    [~, nextRefFrame] = max(vNumGrouped);
+    [~, nextRefFrame] = min(vNumGrouped);
     
     % TODO: print mean(mGroupedPixels(:))*100 and nextRefFrame for each iteration?
 end

@@ -25,6 +25,7 @@ mRefPatchInds = GetRefPatchInds(h, w, mGroupedPixels(:,:,refFrame), sConfig);
 
 %% Denoise per reference patch:
 mY = mX;
+mCountIters = zeros(size(mY)); % counts number of iterations each pixel has been grouped
 for iter = 1:sConfig.sWNNM.nIter
     mY = mY + sConfig.sWNNM.delta*(mX - mY); % TODO: in the paper they do this differently
     
@@ -32,19 +33,20 @@ for iter = 1:sConfig.sWNNM.nIter
     % We perfrom the block matching based on the pre-denoised video, but extract the patches themselves from
     % the noised version.
     if (mod(iter - 1, sConfig.sWNNM.BMIter) == 0)
-        sConfig.sBlockMatching.maxGroupSize = sConfig.sBlockMatching.maxGroupSize - 10; % TODO: do we need this? from original WNNM code
         if (iter == 1)
             mBMInput = mPreDenoised;
         else
             mBMInput = mY;
         end
         [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, true);
+        % next iterations will have less noise - so use less patches in group:
+        sConfig.sBlockMatching.maxGroupSize = sConfig.sBlockMatching.maxGroupSize - 10; % TODO: do we need this? from original WNNM code
     end
     
     % WNNM per group and image aggregation:
-    [mY, mGroupedPixelsCur] = DenoisePatches(mY, mGroupIndices, vNumNeighbors, sConfig);
-    mGroupedPixels = (mGroupedPixels | mGroupedPixelsCur);
+    [mY, mGroupedPixelsCur] = DenoisePatches(mY, mX, mGroupIndices, vNumNeighbors, sConfig);
+    mCountIters = mCountIters + mGroupedPixelsCur;
 end
-mY = (mY - min(mY(:)))/(max(mY(:)) - min(mY(:))); % normalize to [0,1]
+mGroupedPixels = (mGroupedPixels | (mCountIters > sConfig.sWNNM.nIter/2));
 
 end

@@ -64,7 +64,7 @@ for iRef = 1:NRefPatches
     
     %% Find nearest patches from entire patch array:
     [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K);
-    mGroupIndices(iRef, 1:K, :) = mSearchPatchInds(vNearestInds, :);
+    mGroupIndices(iRef, 1:min(K,f*k), :) = mSearchPatchInds(vNearestInds, :);
     vNumNeighbors(iRef) =         sum(vNearestDists <= sConfig.sBlockMatching.distTh);
     
     if isWaitbar && (mod(iRef - 1, 20) == 0)
@@ -193,9 +193,9 @@ function d = PatchDist(mP1, mP2, sConfig)
 
 switch sConfig.sBlockMatching.metric
     case 'l1'
-        d = sum(abs(mP1(:) - mP2(:)));
+        d = mean(abs(mP1(:) - mP2(:)));
     case 'l2'
-        d = sum(abs(mP1(:) - mP2(:)).^2);
+        d = sqrt(mean(abs(mP1(:) - mP2(:)).^2));
     otherwise
         error('Metric not defined');
 end
