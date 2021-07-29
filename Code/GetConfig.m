@@ -33,10 +33,12 @@ assert(sConfig.sBlockMatching.refStride < sConfig.sBlockMatching.patchSize, ...
 
 %% Other algorithm params:
 % TODO: set params
-sConfig.sWNNM.nIter =  8;       % Number of WNNM iterations
-sConfig.sWNNM.delta =  0.1;     % Iterative regularization parameter
-sConfig.sWNNM.C =      sqrt(2); % Weight constant
-sConfig.sWNNM.BMIter = 2;       % Number of iterations between re-block-matching
-sConfig.sWNNM.lambda = 0.54;    % Noise estimate parameter
+sConfig.sWNNM.nIter =        8;       % Number of WNNM iterations
+sConfig.sWNNM.nFrameIter =   5;       % Maximal number of iterations on different reference frame
+sConfig.sWNNM.maxUngrouped = 0.5;     % Maximal allowed percentage of ungrouped pixels to finish algorithm
+sConfig.sWNNM.delta =        0.1;     % Iterative regularization parameter
+sConfig.sWNNM.C =            sqrt(2); % Weight constant
+sConfig.sWNNM.BMIter =       2;       % Number of iterations between re-block-matching
+sConfig.sWNNM.lambda =       0.54;    % Noise estimate parameter
 
 end

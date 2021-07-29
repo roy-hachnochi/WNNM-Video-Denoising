@@ -18,10 +18,10 @@ mFrames = VideoLoader(sConfig.sInput);
 mX = VideoNoise(mFrames, sConfig.sNoise);
 mX = squeeze(mX(:,:,1,:)); % TODO: add solution for multi-channel
 
-subplot(1,2,1);
-imshow(mFrames(:,:,10));
-subplot(1,2,2);
-imshow(mX(:,:,10));
+% subplot(1,2,1);
+% imshow(mFrames(:,:,10));
+% subplot(1,2,2);
+% imshow(mX(:,:,10));
 
 %% Denoise:
 mY = WNNVD(mX, sConfig);

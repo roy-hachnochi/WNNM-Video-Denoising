@@ -14,7 +14,8 @@ mX = squeeze(mX(:,:,1,:));
 [h, w, ~] = size(mX);
 
 %% Run BlockMatching:
-mRefPatchInds = GetRefPatchInds(h, w, sConfig);
+mSkip = false([h, w]);
+mRefPatchInds = GetRefPatchInds(h, w, mSkip, sConfig);
 [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds(refPatchTestInd, :), refFrame, sConfig);
 
 %% Plot results:
@@ -34,7 +35,6 @@ title('Matched Patches in Single Frame');
 
 subplot(1,2,2);
 histogram(mGroupIndices(1,:,3), 1:size(mX,3));  grid on;
-
 xlabel('frame');    ylabel('# patches');
 title(['Number of Matched Patches Per Frame',newline,'Reference Frame: ',num2str(refFrame)]);
 

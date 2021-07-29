@@ -10,7 +10,7 @@ function mY = WNNVD(mX, sConfig)
 %   mY - 3D array of denoised video frames. [h, w, f]
 % --------------------------------------------------------------------------------------------------------- %
 
-[h, w, f] = size(mX);
+[~, ~, f] = size(mX);
 
 %% Pre-denoising for block matching
 mPreDenoised = zeros(size(mX));
@@ -19,11 +19,18 @@ for frame = 1:f
 end
 
 %% Perform WNNVD for a single reference frame
-mY = mX;
-for it = 1:1
-    % TODO: wrap with while/for - for different refernce frames...
-    % TODO: add frame selector
-    [mY, mGroupedPixels] = WNNVDRefFrame(mY, mPreDenoised, ceil(f/2), sConfig);
+mY =             mX;
+mGroupedPixels = false(size(mX));
+nextRefFrame =   ceil(f/2);
+iter =           1;
+while (iter <= sConfig.sWNNM.nFrameIter) && (mean(mGroupedPixels(:))*100 > sConfig.sWNNM.maxUngrouped)
+    [mY, mGroupedPixels] = WNNVDRefFrame(mY, mPreDenoised, mGroupedPixels, nextRefFrame, sConfig);
+    
+    % choose next reference frame based on the one with most ungrouped pixels:
+    vNumGrouped = squeeze(sum(mGroupedPixels, [1, 2]));
+    [~, nextRefFrame] = max(vNumGrouped);
+    
+    % TODO: print mean(mGroupedPixels(:))*100 and nextRefFrame for each iteration?
 end
 
 end
