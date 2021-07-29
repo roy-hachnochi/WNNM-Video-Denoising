@@ -1,4 +1,5 @@
 *.asv
+~*
 BM3D/
 References/
 Video-denoising-master/
