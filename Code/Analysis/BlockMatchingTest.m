@@ -8,9 +8,10 @@ nPatchesToPlot =  15;
 
 %% Initializations:
 sConfig = GetConfig();
+sConfig.sInput.maxFrames = 1;
 p = sConfig.sBlockMatching.patchSize;
 mX = VideoLoader(sConfig.sInput);
-mX = squeeze(mX(:,:,1,:));
+mX = single(squeeze(mX(:,:,1,:)));
 [h, w, ~] = size(mX);
 
 %% Run BlockMatching:
@@ -22,7 +23,7 @@ mRefPatchInds = GetRefPatchInds(h, w, mSkip, sConfig);
 % Display matched patches for same reference frame, and show histogram of patches per frames:
 figure;
 subplot(1,2,1);
-imshow(mX(:,:,refFrame));   hold on;
+imshow(uint8(mX(:,:,refFrame)));   hold on;
 for iPatch = 1:size(mGroupIndices, 2)
     if (mGroupIndices(1, iPatch, 3) == refFrame) % display only current frame's patches
         rectangle('Position', [mGroupIndices(1, iPatch, 2), mGroupIndices(1, iPatch, 1), p, p],...
@@ -45,5 +46,5 @@ for iPatch = 1:nPatchesToPlot
     col =   mGroupIndices(1, iPatch, 2);
     frame = mGroupIndices(1, iPatch, 3);
     subplot(ceil(nPatchesToPlot/5), 5, iPatch);
-    imshow(mX(row + (0:(p-1)), col + (0:(p-1)), frame));
+    imshow(uint8(mX(row + (0:(p-1)), col + (0:(p-1)), frame)));
 end

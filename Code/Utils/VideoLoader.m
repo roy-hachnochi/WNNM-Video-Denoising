@@ -18,12 +18,12 @@ if sInputConfig.isGray
     ch = 1;
 end
 
-mFrames = zeros([h, w, ch, min(f, sInputConfig.maxFrames)], 'single');
+mFrames = zeros([h, w, ch, min(f, sInputConfig.maxFrames)], 'uint8');
 for ind = 1:min(f, sInputConfig.maxFrames)
     if sInputConfig.isGray
-        mFrames(:,:,1,ind) = single(rgb2gray(mOrigFrames(:,:,:,ind)))/255;
+        mFrames(:,:,1,ind) = rgb2gray(mOrigFrames(:,:,:,ind));
     else
-        mFrames(:,:,:,ind) = im2single(mOrigFrames(:,:,:,ind));
+        mFrames(:,:,:,ind) = mOrigFrames(:,:,:,ind);
     end
 end
 
