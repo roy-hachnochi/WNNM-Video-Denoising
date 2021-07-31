@@ -39,11 +39,20 @@ for iRef = 1:NRefPatches
     vRefPatchInds = [mRefPatchInds(iRef, :), refFrame]; % include frame
     ind = 0;
     
+%     if iRef == 1 || iRef == NRefPatches % Profiler
+%         npStamp = ProfilerStartRecord(sConfig);
+%     end   
     % Non-predictive (exhaustive) block matching for first frame:
     [mFirstInds, vFirstDists] = BlockMatchingNonPred(mX, vRefPatchInds, sConfig);
     mSearchPatchInds(ind*k + (1:k), :) = mFirstInds;
     vSearchPatchDists(ind*k + (1:k)) =   vFirstDists;
-    
+%     if iRef == 1 || iRef == NRefPatches % Profiler
+%         ProfilerEndRecord(npStamp, "Non-Predictive-Search", iRef, sConfig);
+%     end
+
+%     if iRef == 1 || iRef == NRefPatches % Profiler
+%         pStamp = ProfilerStartRecord(sConfig);
+%     end   
     % Forward predictive block matching:
     mCurPatchInds = mFirstInds;
     for iFrame = refFrame+1:f
@@ -61,7 +70,9 @@ for iRef = 1:NRefPatches
         mSearchPatchInds(ind*k + (1:k), :) = mCurPatchInds;
         vSearchPatchDists(ind*k + (1:k)) =   vCurPatchDists;
     end
-    
+%     if iRef == 1 || iRef == NRefPatches % Profiler
+%         ProfilerEndRecord(pStamp, "Predictive-Search", iRef, sConfig);
+%     end    
     %% Find nearest patches from entire patch array:
     [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K);
     mGroupIndices(iRef, 1:min(K,f*k), :) = mSearchPatchInds(vNearestInds, :);
@@ -106,25 +117,36 @@ refCol =   vRefPatchInds(2);
 refFrame = vRefPatchInds(3);
 
 mRefPatch = mX(refRow + (0:p-1), refCol + (0:p-1), refFrame);
+mRefPatch = reshape(mRefPatch,[1 size(mRefPatch)]);
+
+mSinglePatchInd = (0:p-1)' + (0:h:h*(p-1)); % relative indices to the top-left corner for any patch in the frame
+mSinglePatchInd = reshape(mSinglePatchInd,[1 size(mSinglePatchInd)]); % Adjust for 3-D efficient calculations
 
 % calculate search window:
-vSearchRows = unique(max(1, min(refRow + [flip(0:-s:-m), s:s:m], h - p + 1)));
-vSearchCols = unique(max(1, min(refCol + [flip(0:-s:-m), s:s:m], w - p + 1)));
-[mSearchRows, mSearchCols] = meshgrid(vSearchRows, vSearchCols);
-mSearchInds = zeros(length(vSearchRows)*length(vSearchCols), 2);
-mSearchInds(:, 1) = mSearchRows(:);
-mSearchInds(:, 2) = mSearchCols(:);
+vStridR = [flip(0:-s:-m), s:s:m];
+vStrideC = [flip(0:-s*h:-m*h), s*h:s*h:m*h];
 
-% find dists:
-vDists = zeros(size(mSearchInds, 1), 1);
-for ind = 1:size(mSearchInds, 1)
-    mPatch = mX(mSearchInds(ind, 1) + (0:p-1), mSearchInds(ind, 2) + (0:p-1), refFrame);
-    vDists(ind) = PatchDist(mRefPatch, mPatch, sConfig);
-end
+vWinInd = [flip(0:-s:-m), s:s:m]' + [flip(0:-s*h:-m*h), s*h:s*h:m*h]; % index offset for each of the patches in th search window
+vWinInd = vWinInd(:); % we dont neet this matrix as 2-D
+refIdx = sub2ind([h, w],refRow,refCol);
+
+
+% handle out-of-boundary cases of the search window by masking patches that out of frame
+vMaskRow = (mod(refIdx,h)+vStridR > 0) & (mod(refIdx,h)+vStridR < h-p+1);
+vMaskCol = ((refIdx+vStrideC) > 0) & ((refIdx+vStrideC) < (w-p)*h+1); 
+mMask = vMaskRow'&vMaskCol;
+vWinInd(~mMask(:)) = []; % Avoid using masked patches
+
+vIdx = refIdx+vWinInd;
+
+% find dists: 
+mDiffPatches = mX(vIdx+repmat(mSinglePatchInd,[length(vIdx) 1 1])+(refFrame-1)*h*w) - repmat(mRefPatch,[length(vIdx) 1 1]);
+vDists = PatchDist(mDiffPatches, sConfig);
 
 % get nearest patches:
 [vNearestDists, vNearestInds] = mink(vDists, k);
-mNearestInds = [mSearchInds(vNearestInds, :), repmat(refFrame, [k, 1])];
+[vRows,vCols] = ind2sub([h w],vIdx(vNearestInds));
+mNearestInds = [vRows, vCols, repmat(refFrame, [k, 1])];
 
 end
 
@@ -158,44 +180,68 @@ refCol =   vRefPatchInds(2);
 refFrame = vRefPatchInds(3);
 
 mRefPatch = mX(refRow + (0:p-1), refCol + (0:p-1), refFrame);
+mRefPatch = reshape(mRefPatch,[1 size(mRefPatch)]);
+
+mSinglePatchInd = (0:p-1)' + (0:h:h*(p-1)); % relative indices to the top-left corner for any patch in the frame
+mSinglePatchInd = reshape(mSinglePatchInd,[1 size(mSinglePatchInd)]); % Adjust for 3-D efficient calculations
 
 % calculate search windows:
-% TODO: changing mSearchInds size every loop iteration may be inefficient - think of an elegant way to
-% improve this
-mSearchInds = [];
-for windNum = 1:size(mPrevNearestInds, 1)
-    vSearchRows = unique(max(1, min(mPrevNearestInds(windNum, 1) + [flip(0:-s:-m), s:s:m], h - p + 1)));
-    vSearchCols = unique(max(1, min(mPrevNearestInds(windNum, 2) + [flip(0:-s:-m), s:s:m], w - p + 1)));
-    [mSearchRows, mSearchCols] = meshgrid(vSearchRows, vSearchCols);
-    mCurSearchInds = zeros(length(vSearchRows)*length(vSearchCols), 2);
-    mCurSearchInds(:, 1) = mSearchRows(:);
-    mCurSearchInds(:, 2) = mSearchCols(:);
-    mSearchInds = [mSearchInds; mCurSearchInds]; %#ok
-end
-mSearchInds = unique(mSearchInds, 'rows'); % there could be repeating patches from different windows
+% indStamp = ProfilerStartRecord(sConfig);
+vStrideR = [flip(0:-s:-m), s:s:m];
+vStrideC = [flip(0:-s*h:-m*h), s*h:s*h:m*h];
+
+vWinInd = vStrideR' + vStrideC; % index offset for each of the patches in th search window
+vWinInd = reshape(vWinInd,1,[]); % vectorize the window for single nearest patches
+vWinInd = repmat(vWinInd, [size(mPrevNearestInds,1) 1]); % make 2-D matrix : 1st dim - # patches; 2nd dim - patch size p^2
+vWinInd = vWinInd(:); % vectorize the whole struct as it will be masked
+vIdx = sub2ind([h, w],mPrevNearestInds(:, 1),mPrevNearestInds(:, 2));
+
+% handle out-of-boundary cases of the search window by masking patches that out of frame
+vMaskRow = (mod(vIdx,h)+vStrideR > 0) & (mod(vIdx,h)+vStrideR < h-p);
+vMaskCol = ((vIdx+vStrideC) > 0) & ((vIdx+vStrideC) < (w-p)*h); 
+
+mMaskRows = repmat(vMaskRow,[1 1 3]);
+mMaskRows = reshape(mMaskRows,size(mMaskRows,1),[]);
+mMaskCols = permute(repmat(vMaskCol,[1 1 3]),[1 3 2]);
+mMaskCols = reshape(mMaskCols,size(mMaskCols,1),[]);
+mMask = mMaskRows & mMaskCols;
+
+vIdx = repmat(vIdx,[1 m^2]);
+vIdx = vIdx(:);
+
+vIdx = vIdx+vWinInd;
+vIdx(~mMask(:)) = []; % avoid masked patches
+vIdx = unique(vIdx);
+% % ProfilerEndRecord(indStamp, "Predictive-Ind-Search", sConfig);
+
 
 % find dists:
-vDists = zeros(size(mSearchInds, 1), 1);
-for ind = 1:size(mSearchInds, 1)
-    mPatch = mX(mSearchInds(ind, 1) + (0:p-1), mSearchInds(ind, 2) + (0:p-1), iFrame);
-    vDists(ind) = PatchDist(mRefPatch, mPatch, sConfig);
-end
+% distStamp = ProfilerStartRecord(sConfig);
+% Efficient implementation by using Indices instead of subscripts and arrangeing patches in 3-D tensor
+mDiffPatches = mX(vIdx+repmat(mSinglePatchInd,[length(vIdx) 1 1])+(iFrame-1)*h*w) - repmat(mRefPatch,[length(vIdx) 1 1]);
+vDists = PatchDist(mDiffPatches, sConfig);
+% ProfilerEndRecord(distStamp, "Predictive-Dist", sConfig);
 
 % get nearest patches:
+% minkStamp = ProfilerStartRecord(sConfig);
 [vNearestDists, vNearestInds] = mink(vDists, k);
-mNearestInds = [mSearchInds(vNearestInds, :), repmat(iFrame, [k, 1])];
-
+[vRows,vCols] = ind2sub([h, w],vIdx(vNearestInds));
+mNearestInds = [vRows, vCols, repmat(iFrame, [k, 1])];
+% ProfilerEndRecord(minkStamp, "Predictive-Mink", sConfig);
 end
 
 %% ==========================================================================================================
-function d = PatchDist(mP1, mP2, sConfig)
-% Finds distance between two patches, defined by some metric
+function d = PatchDist(mDiffPatches, sConfig)
+% Inputs is 3-D tensor that contains the differences between suspected 
+% patches and thereference patch.
+%   - 1st dim is the number of suspected patches
+%   - 2nd & 3rd dims are the size of the patches
 
 switch sConfig.sBlockMatching.metric
     case 'l1'
-        d = mean(abs(mP1(:) - mP2(:)));
+        d = sum(abs(mDiffPatches),[2 3]);
     case 'l2'
-        d = sqrt(mean(abs(mP1(:) - mP2(:)).^2));
+        d = sqrt(sum(abs(mDiffPatches).^2,[2 3]));
     otherwise
         error('Metric not defined');
 end

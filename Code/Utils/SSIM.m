@@ -3,7 +3,15 @@ function [ssim] = SSIM(mVid1, mVid2)
 % Calculates SSIM evaluation metric between two videos/images.
 % --------------------------------------------------------------------------------------------------------- %
 
+% Logic to deal with case of non matching dimensions due to SINGLETON dimentions
+if length(size(mVid1))> length(size(mVid2))
+    mVid1 = squeeze(mVid1);
+elseif length(size(mVid1))< length(size(mVid2))
+    mVid2 = squeeze(mVid2);
+end
+
 sz = size(mVid1);
+
 ssim  = 0;
 
 if (length(sz) == 2) % videos are actually images
@@ -13,7 +21,7 @@ elseif (length(sz) == 3) % either multiple channels or multiple frames
         ssim = ssim + ssim_index(mVid1(:,:,ind), mVid2(:,:,ind));
     end
     ssim = ssim / prod(sz(3));
-elseif (length(sz) == 3) % both multiple channels and multiple frames
+elseif (length(sz) == 4) % both multiple channels and multiple frames
     for ind1 = 1:sz(3)
         for ind = 1:sz(4)
             ssim = ssim + ssim_index(mVid1(:,:,ind1,ind2), mVid2(:,:,ind,ind2));
@@ -21,7 +29,7 @@ elseif (length(sz) == 3) % both multiple channels and multiple frames
     end
     ssim = ssim / (sz(3)*sz(4));
 else
-    error('%d dimensions not supported.', length(sz));
+    error('%d dimensions not supported.', length(sz))
 end
 
 end
@@ -225,3 +233,4 @@ end
 mssim = mean2(ssim_map);
 
 return
+end

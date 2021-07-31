@@ -21,13 +21,18 @@ function [mY, mGroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, mGroupedPixels, 
 [h, w, ~] = size(mX);
 
 %% Get reference patch indices:
+% refStamp = ProfilerStartRecord(sConfig); % Profiler
 mRefPatchInds = GetRefPatchInds(h, w, mGroupedPixels(:,:,refFrame), sConfig);
+% ProfilerEndRecord(refStamp, "Get-Ref-Patch-Inds", sConfig); % Profiler
 
 %% Denoise per reference patch:
 mY = mX;
 mCountIters = zeros(size(mY)); % counts number of iterations each pixel has been grouped
+
+% iterStamp = ProfilerStartRecord(sConfig); % Profiler
 for iter = 1:sConfig.sWNNM.nIter
-    mY = mY + sConfig.sWNNM.delta*(mX - mY); % TODO: in the paper they do this differently
+    
+    mY = mY + sConfig.sWNNM.delta*(mX - mY); % TODO: in the paper they do this differently ; URI : are you sure?
     
     % Block matching:
     % We perfrom the block matching based on the pre-denoised video, but extract the patches themselves from
@@ -38,15 +43,26 @@ for iter = 1:sConfig.sWNNM.nIter
         else
             mBMInput = mY;
         end
-        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, true);
+        
+%         bmStamp = ProfilerStartRecord(sConfig); % Profiler
+        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
+%         ProfilerEndRecord(bmStamp, "Block-Matching", iter, sConfig); % Profiler
+        
         % next iterations will have less noise - so use less patches in group:
         sConfig.sBlockMatching.maxGroupSize = sConfig.sBlockMatching.maxGroupSize - 10; % TODO: do we need this? from original WNNM code
     end
     
     % WNNM per group and image aggregation:
+%     deStamp = ProfilerStartRecord(sConfig); % Profiler
     [mY, mGroupedPixelsCur] = DenoisePatches(mY, mX, mGroupIndices, vNumNeighbors, sConfig);
+%     ProfilerEndRecord(deStamp, "Denoise-Patches", iter, sConfig); % Profiler
+    
     mCountIters = mCountIters + mGroupedPixelsCur;
+    
+
 end
+% ProfilerEndRecord(iterStamp, "Per Frame Denoise", sConfig); % Profiler #TODO : not working if tic-toc called in the middle
+
 mGroupedPixels = (mGroupedPixels | (mCountIters > sConfig.sWNNM.nIter/2));
 
 end
