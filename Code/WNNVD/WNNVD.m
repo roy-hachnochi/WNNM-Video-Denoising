@@ -31,6 +31,8 @@ while (iter <= sConfig.sWNNM.nFrameIter) && (mean(~mGroupedPixels(:))*100 > sCon
     [~, nextRefFrame] = min(vNumGrouped);
     
     % TODO: print mean(mGroupedPixels(:))*100 and nextRefFrame for each iteration?
+    % Uri : add iter incrementation?
+    iter = iter + 1;
 end
 
 end

@@ -29,7 +29,9 @@ mX = squeeze(mX(:,:,1,:)); % TODO: add solution for multi-channel
 
 %% Denoise:
 mX = single(mX);
+tStamp = ProfilerStartRecord(sConfig);
 mY = WNNVD(mX, sConfig);
+ProfilerEndRecord(tStamp, "WNNVD Run-Time", sConfig);
 mY = uint8(mY);
 
 %% Save and show results:
