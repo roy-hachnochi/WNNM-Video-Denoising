@@ -61,6 +61,6 @@ for iter = 1:sConfig.sWNNM.nIter
 end
 % ProfilerEndRecord(iterStamp, "Per Frame Denoise", sConfig); % Profiler #TODO : not working if tic-toc called in the middle
 
-mGroupedPixels = (mGroupedPixels | (mCountIters > sConfig.sWNNM.nIter/2));
+mGroupedPixels = (mGroupedPixels | (mCountIters >= sConfig.sWNNM.minIterForSkip));
 
 end

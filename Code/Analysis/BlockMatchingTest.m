@@ -9,9 +9,9 @@ maxFrames =       3;
 
 %% Initializations:
 sConfig = GetConfig();
-sConfig.sInput.maxFrames = maxFrames;
+sConfig.sTest.maxFrames = maxFrames;
 p = sConfig.sBlockMatching.patchSize;
-mX = VideoLoader(sConfig.sInput);
+mX = VideoLoad(sConfig.sTest);
 mX = single(squeeze(mX(:,:,1,:)));
 [h, w, ~] = size(mX);
 

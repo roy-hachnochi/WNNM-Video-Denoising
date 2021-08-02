@@ -4,11 +4,12 @@ function sConfig = GetConfig()
 % --------------------------------------------------------------------------------------------------------- %
 
 %% Test video:
-sConfig.sInput.videoPath = 'xylophone.mp4';     % Video path for testing
-sConfig.sInput.maxFrames = 3;                  % Maximal number of frames (for runtime considerations)
-sConfig.sInput.isGray =    true;                % Use grayscale video or RGB
+sConfig.sTest.vidInPath = 'xylophone.mp4';         % Video input path for testing
+sConfig.sTest.vidOutPath = 'Results/xylophone';    % Video output path for testing
+sConfig.sTest.maxFrames = 20;                      % Maximal number of frames (runtime considerations)
+sConfig.sTest.isGray =    true;                    % Use grayscale video or RGB
 
-assert(sConfig.sInput.isGray, "TODO: TEMP! implement solution for RGB by working on luminance space");
+assert(sConfig.sTest.isGray, "TODO: TEMP! implement solution for RGB by working on luminance space");
 
 %% Noise types:
 sConfig.sNoise.isPoiss = false;                 % Add Poisson noise or not
@@ -33,14 +34,16 @@ assert(sConfig.sBlockMatching.refStride <= sConfig.sBlockMatching.patchSize, ...
 
 %% Other algorithm params:
 % TODO: set params
-sConfig.sWNNM.nIter =        4;       % Number of WNNM iterations
-sConfig.sWNNM.nFrameIter =   5;       % Maximal number of iterations on different reference frame
-sConfig.sWNNM.maxUngrouped = 0.2;     % Maximal allowed percentage of ungrouped pixels to finish algorithm
-sConfig.sWNNM.delta =        0.1;     % Iterative regularization parameter
-sConfig.sWNNM.C =            sqrt(2); % Weight constant
-sConfig.sWNNM.BMIter =       2;       % Number of iterations between re-block-matching
-sConfig.sWNNM.lambda =       0.54;    % Noise estimate parameter
+sConfig.sWNNM.nIter =          4;       % Number of WNNM iterations
+sConfig.sWNNM.nFrameIter =     5;       % Maximal number of iterations on different reference frame
+sConfig.sWNNM.maxUngrouped =   0.2;     % Maximal allowed percentage of ungrouped pixels to finish algorithm
+sConfig.sWNNM.delta =          0.1;     % Iterative regularization parameter
+sConfig.sWNNM.C =              sqrt(2); % Weight constant
+sConfig.sWNNM.BMIter =         2;       % Number of iterations between re-block-matching
+sConfig.sWNNM.lambda =         0.54;    % Noise estimate parameter
+sConfig.sWNNM.minIterForSkip = 4;       % Minimal number of iterations on pixel to consider it as denoised
 
 %% Debug params
 sConfig.sDB.profiler =       true;    % Print timing of selected logics
+
 end

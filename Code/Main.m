@@ -12,20 +12,12 @@ rng(42);
 sConfig = GetConfig();
 
 %% Load video:
-mFrames = VideoLoader(sConfig.sInput);
-
-% TODO: temp for test
-% mIm = imread('lena.png');
-% mFrames = reshape(mIm, [size(mIm, 1), size(mIm, 2), 1, 1]);
+[mFrames, frameRate] = VideoLoad(sConfig.sTest);
+[h, w, ch, f] = size(mFrames);
 
 %% Add noise:
 mX = VideoNoise(mFrames, sConfig.sNoise);
 mX = squeeze(mX(:,:,1,:)); % TODO: add solution for multi-channel
-
-% subplot(1,2,1);
-% imshow(uint8(mFrames(:,:,10)));
-% subplot(1,2,2);
-% imshow(uint8(mX(:,:,10)));
 
 %% Denoise:
 mX = single(mX);
@@ -33,8 +25,8 @@ tStamp = ProfilerStartRecord(sConfig);
 mY = WNNVD(mX, sConfig);
 ProfilerEndRecord(tStamp, "WNNVD Run-Time", sConfig);
 
-mX = uint8(mX);
-mY = uint8(mY);
+mX = reshape(uint8(mX), [h, w, ch, f]);
+mY = reshape(uint8(mY), [h, w, ch, f]);
 
 %% Save and show results:
-
+VideoSave(mY, frameRate, sConfig.sTest);
