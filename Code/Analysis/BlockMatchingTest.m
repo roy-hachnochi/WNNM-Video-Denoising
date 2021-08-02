@@ -1,14 +1,15 @@
 % Test for BlockMatching function:
 
 %% Parameters:
-refFrame =        30;
-refPatchTestInd = 700;
+refFrame =        2;
+refPatchTestInd = 238;
 FACE_ALPHA =      0.3;
 nPatchesToPlot =  15;
+maxFrames =       3;
 
 %% Initializations:
 sConfig = GetConfig();
-sConfig.sInput.maxFrames = 1;
+sConfig.sInput.maxFrames = maxFrames;
 p = sConfig.sBlockMatching.patchSize;
 mX = VideoLoader(sConfig.sInput);
 mX = single(squeeze(mX(:,:,1,:)));
@@ -35,7 +36,7 @@ rectangle('Position', [mRefPatchInds(refPatchTestInd, 2), mRefPatchInds(refPatch
 title('Matched Patches in Single Frame');
 
 subplot(1,2,2);
-histogram(mGroupIndices(1,:,3), 1:size(mX,3));  grid on;
+histogram(mGroupIndices(1,:,3), 1:(size(mX,3)+1));  grid on;
 xlabel('frame');    ylabel('# patches');
 title(['Number of Matched Patches Per Frame',newline,'Reference Frame: ',num2str(refFrame)]);
 

@@ -17,6 +17,7 @@ function [mY, mGroupedPixels] = WNNVDRefFrame(mX, mPreDenoised, mGroupedPixels, 
 % TODO: add PSNR (and other metrics) printing for each iteration?
 % TODO: save log with intermediate results for research (PSNR per it, amount of matched patches from each
 % frame, number of times we enter this function, ...)?
+% TODO: erase all unnecassary profiler lines
 
 [h, w, ~] = size(mX);
 
@@ -43,7 +44,6 @@ for iter = 1:sConfig.sWNNM.nIter
         else
             mBMInput = mY;
         end
-        
 %         bmStamp = ProfilerStartRecord(sConfig); % Profiler
         [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
 %         ProfilerEndRecord(bmStamp, "Block-Matching", iter, sConfig); % Profiler
@@ -58,8 +58,6 @@ for iter = 1:sConfig.sWNNM.nIter
 %     ProfilerEndRecord(deStamp, "Denoise-Patches", iter, sConfig); % Profiler
     
     mCountIters = mCountIters + mGroupedPixelsCur;
-    
-
 end
 % ProfilerEndRecord(iterStamp, "Per Frame Denoise", sConfig); % Profiler #TODO : not working if tic-toc called in the middle
 

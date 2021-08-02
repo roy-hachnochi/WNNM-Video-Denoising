@@ -29,10 +29,9 @@ while (iter <= sConfig.sWNNM.nFrameIter) && (mean(~mGroupedPixels(:))*100 > sCon
     % choose next reference frame based on the one with most ungrouped pixels:
     vNumGrouped = squeeze(sum(mGroupedPixels, [1, 2]));
     [~, nextRefFrame] = min(vNumGrouped);
+    iter = iter + 1;
     
     % TODO: print mean(mGroupedPixels(:))*100 and nextRefFrame for each iteration?
-    % Uri : add iter incrementation?
-    iter = iter + 1;
 end
 
 end

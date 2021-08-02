@@ -32,6 +32,8 @@ mX = single(mX);
 tStamp = ProfilerStartRecord(sConfig);
 mY = WNNVD(mX, sConfig);
 ProfilerEndRecord(tStamp, "WNNVD Run-Time", sConfig);
+
+mX = uint8(mX);
 mY = uint8(mY);
 
 %% Save and show results:

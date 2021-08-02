@@ -4,15 +4,15 @@ function [ssim] = SSIM(mVid1, mVid2)
 % --------------------------------------------------------------------------------------------------------- %
 
 % Logic to deal with case of non matching dimensions due to SINGLETON dimentions
-if length(size(mVid1))> length(size(mVid2))
+if length(size(mVid1)) > length(size(mVid2))
     mVid1 = squeeze(mVid1);
-elseif length(size(mVid1))< length(size(mVid2))
+elseif length(size(mVid1)) < length(size(mVid2))
     mVid2 = squeeze(mVid2);
 end
 
 sz = size(mVid1);
 
-ssim  = 0;
+ssim = 0;
 
 if (length(sz) == 2) % videos are actually images
     ssim = ssim_index(mVid1, mVid2);
