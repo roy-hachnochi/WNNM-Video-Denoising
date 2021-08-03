@@ -1,12 +1,12 @@
 function [mFrames, frameRate] = VideoLoad(sTestConfig)
 % --------------------------------------------------------------------------------------------------------- %
-% Loads video frames and converts to single format.
+% Loads video frames.
 %
 % Input:
 %   sTestConfig - Struct containing input video parameters.
 %
 % Output:
-%   mFrames -   4D array of frames. [h, w, ch, f]
+%   mFrames -   4D array of frames (UINT8). [h, w, ch, f]
 %   frameRate - Frame rate of video.
 % --------------------------------------------------------------------------------------------------------- %
 

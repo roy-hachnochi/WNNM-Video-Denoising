@@ -38,21 +38,12 @@ for iRef = 1:NRefPatches
     
     vRefPatchInds = [mRefPatchInds(iRef, :), refFrame]; % include frame
     ind = 0;
-    
-%     if iRef == 1 || iRef == NRefPatches % Profiler
-%         npStamp = ProfilerStartRecord(sConfig);
-%     end   
+      
     % Non-predictive (exhaustive) block matching for first frame:
     [mFirstInds, vFirstDists] = BlockMatchingNonPred(mX, vRefPatchInds, sConfig);
     mSearchPatchInds(ind*k + (1:k), :) = mFirstInds;
     vSearchPatchDists(ind*k + (1:k)) =   vFirstDists;
-%     if iRef == 1 || iRef == NRefPatches % Profiler
-%         ProfilerEndRecord(npStamp, "Non-Predictive-Search", iRef, sConfig);
-%     end
-
-%     if iRef == 1 || iRef == NRefPatches % Profiler
-%         pStamp = ProfilerStartRecord(sConfig);
-%     end   
+ 
     % Forward predictive block matching:
     mCurPatchInds = mFirstInds;
     for iFrame = refFrame+1:f
@@ -69,10 +60,7 @@ for iRef = 1:NRefPatches
         [mCurPatchInds, vCurPatchDists] = BlockMatchingPred(mX, vRefPatchInds, mCurPatchInds, iFrame, sConfig);
         mSearchPatchInds(ind*k + (1:k), :) = mCurPatchInds;
         vSearchPatchDists(ind*k + (1:k)) =   vCurPatchDists;
-    end
-%     if iRef == 1 || iRef == NRefPatches % Profiler
-%         ProfilerEndRecord(pStamp, "Predictive-Search", iRef, sConfig);
-%     end    
+    end  
     %% Find nearest patches from entire patch array:
     [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K);
     mGroupIndices(iRef, 1:min(K,f*k), :) = mSearchPatchInds(vNearestInds, :);

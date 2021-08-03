@@ -23,8 +23,8 @@ elseif (length(sz) == 3) % either multiple channels or multiple frames
     ssim = ssim / prod(sz(3));
 elseif (length(sz) == 4) % both multiple channels and multiple frames
     for ind1 = 1:sz(3)
-        for ind = 1:sz(4)
-            ssim = ssim + ssim_index(mVid1(:,:,ind1,ind2), mVid2(:,:,ind,ind2));
+        for ind2 = 1:sz(4)
+            ssim = ssim + ssim_index(mVid1(:,:,ind1,ind2), mVid2(:,:,ind1,ind2));
         end
     end
     ssim = ssim / (sz(3)*sz(4));
