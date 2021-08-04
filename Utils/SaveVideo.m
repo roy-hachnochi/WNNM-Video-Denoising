@@ -1,29 +1,31 @@
-function [] = VideoSave(mFrames, frameRate, sTestConfig)
+function [] = SaveVideo(mFrames, frameRate, vidPath)
 % --------------------------------------------------------------------------------------------------------- %
 % Saves video/image to file in AVI/specified format.
 %
 % Input:
-%   mFrames -     4D array of frames. [h, w, ch, f]
-%   frameRate -   Frame rate of video.
-%   sTestConfig - Struct containing output video parameters.
+%   mFrames -   4D array of frames. [h, w, ch, f]
+%   frameRate - Frame rate of video.
+%   vidPath -   Video output path.
+%
+% TODO:
+%   1) Make sure that function works also for RGB videos/images.
 % --------------------------------------------------------------------------------------------------------- %
 
 warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
-% TODO: check if also works for RGB
-
 [~, ~, ~, f] = size(mFrames);
-vidPath = split(sTestConfig.vidOutPath, '.');
-vidDir = split(vidPath{1}, '/');
-mkdir(join(vidDir{1:end-1}, '/'));
+vidName = split(vidPath, '.');
+vidDir = split(vidName{1}, '/');
+vidDir = join(vidDir(1:end-1), '/');
+mkdir(vidDir{1});
 
 if (f == 1)
     % video is actually an image
-    imwrite(mFrames, sTestConfig.vidOutPath);
+    imwrite(mFrames, vidPath);
     return;
 end
 
-writer = VideoWriter(vidPath{1});
+writer = VideoWriter(vidName{1});
 writer.FrameRate = frameRate;
 
 open(writer)

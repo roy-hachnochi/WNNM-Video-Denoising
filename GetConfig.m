@@ -1,15 +1,19 @@
 function sConfig = GetConfig()
 % --------------------------------------------------------------------------------------------------------- %
 % Defines parameters configuration for using and reproducing WNNVD results.
+%
+% TODO: Set params.
 % --------------------------------------------------------------------------------------------------------- %
 
 %% Test video:
-sConfig.sTest.vidInPath = 'xylophone.mp4';         % Video input path for testing
-sConfig.sTest.vidOutPath = 'Results/xylophone';    % Video output path for testing
-sConfig.sTest.maxFrames = 20;                      % Maximal number of frames (runtime considerations)
-sConfig.sTest.isGray =    true;                    % Use grayscale video or RGB
+sConfig.sTest.vidInPath =     'xylophone.mp4';              % Video input path for testing
+sConfig.sTest.vidOutPath =    'Results/Clean/xylophone';    % Video output path
+sConfig.sTest.vidNoisedPath = 'Results/Noised/xylophone';   % Noised video output path
+sConfig.sTest.logPath =       'Results/Logs/xylophone';     % Noised video output path
+sConfig.sTest.maxFrames =     20;                           % Maximal number of frames (for runtime)
+sConfig.sTest.isGray =        true;                         % Use grayscale video or RGB
 
-assert(sConfig.sTest.isGray, "TODO: TEMP! implement solution for RGB by working on luminance space");
+assert(sConfig.sTest.isGray, "TODO: TEMP! implement solution for RGB");
 
 %% Noise types:
 sConfig.sNoise.isPoiss = false;                 % Add Poisson noise or not
@@ -17,11 +21,10 @@ sConfig.sNoise.sigma =   20;                    % Gaussian noise STD (in [0,255]
 sConfig.sNoise.snp =     0.00;                  % Salt & pepper noise density
 
 %% Block matching params:
-% TODO: set params
 sConfig.sBlockMatching.refStride =         7;    % Stride between reference pathces
 sConfig.sBlockMatching.patchSize =         8;    % Patch size
 sConfig.sBlockMatching.maxNeighborsFrame = 70;   % Maximal number of nearest neighbors per frame
-sConfig.sBlockMatching.maxGroupSize =      70;   % Maximal group size (number of patches) per reference patch
+sConfig.sBlockMatching.maxGroupSize =      200;  % Maximal group size (number of patches) per reference patch
 sConfig.sBlockMatching.searchWindowNP =    30;   % Non-predictive search window
 sConfig.sBlockMatching.searchStrideNP =    2;    % Non-predictive stride between search patches
 sConfig.sBlockMatching.searchWindowP =     3;    % Predictive search window.
@@ -33,7 +36,6 @@ assert(sConfig.sBlockMatching.refStride <= sConfig.sBlockMatching.patchSize, ...
     "Stride must by smaller or equal to Patch Size in order to cover the entire image");
 
 %% Other algorithm params:
-% TODO: set params
 sConfig.sWNNM.nIter =          8;       % Number of WNNM iterations
 sConfig.sWNNM.nFrameIter =     50;      % Maximal number of iterations on different reference frame
 sConfig.sWNNM.maxUngrouped =   0.2;     % Maximal allowed percentage of ungrouped pixels to finish algorithm

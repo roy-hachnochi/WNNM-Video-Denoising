@@ -12,15 +12,14 @@ rng(42);
 sConfig = GetConfig();
 
 %% Load video:
-[mFrames, frameRate] = VideoLoad(sConfig.sTest);
+[mFrames, frameRate] = LoadVideo(sConfig.sTest);
 [h, w, ch, f] = size(mFrames);
 
 %% Add noise:
 mX = VideoNoise(mFrames, sConfig.sNoise);
-mX = squeeze(mX(:,:,1,:)); % TODO: add solution for multi-channel
 
 %% Denoise:
-mX = single(mX);
+mX = single(squeeze(mX(:,:,1,:)));
 [mY, sLog] = WNNVD(mX, sConfig);
 
 mX = reshape(uint8(mX), [h, w, ch, f]);
@@ -29,7 +28,10 @@ mY = reshape(uint8(mY), [h, w, ch, f]);
 %% Calculate success metrics:
 sLog.psnr = PSNR(mFrames, mY);
 sLog.ssim = SSIM(mFrames, mY);
-fprintf("\n==== Done! PSNR: %.2f | SSIM: %.2f | Time: %.2f ====\n\n", sLog.psnr, sLog.ssim, sum(sLog.vTime));
+fprintf("\n==== Done! PSNR: %.2f | SSIM: %.2f | Time: %.2f min ====\n\n",...
+    sLog.psnr, sLog.ssim, sum(sLog.vTime)/60);
 
-%% Save and show results:
-VideoSave(mY, frameRate, sConfig.sTest);
+%% Save results:
+SaveVideo(mY, frameRate, sConfig.sTest.vidOutPath);
+SaveVideo(mX, frameRate, sConfig.sTest.vidNoisedPath);
+SaveLog(sLog, sConfig.sTest.logPath)

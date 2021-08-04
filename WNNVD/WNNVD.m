@@ -9,6 +9,9 @@ function [mY, sLog] = WNNVD(mX, sConfig)
 % Output:
 %   mY -   3D array of denoised video frames. [h, w, f]
 %   sLog - (optional) Log struct with run statistics.
+%
+% TODO:
+%   1) Implement solution for multi-channel (color) videos.
 % --------------------------------------------------------------------------------------------------------- %
 
 [~, ~, f] = size(mX);

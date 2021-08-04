@@ -1,4 +1,4 @@
-function [mFrames, frameRate] = VideoLoad(sTestConfig)
+function [mFrames, frameRate] = LoadVideo(sTestConfig)
 % --------------------------------------------------------------------------------------------------------- %
 % Loads video frames.
 %

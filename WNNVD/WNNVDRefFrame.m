@@ -28,7 +28,7 @@ mCountIters = zeros(size(mY)); % counts number of iterations each pixel has been
 
 for iter = 1:sConfig.sWNNM.nIter
     
-    mY = mY + sConfig.sWNNM.delta*(mX - mY); % TODO: in the paper they do this differently ; URI : are you sure?
+    mY = mY + sConfig.sWNNM.delta*(mX - mY);
     
     % Block matching:
     % We perfrom BM based on the pre-denoised video, but extract the patches from the noised version.
@@ -39,10 +39,10 @@ for iter = 1:sConfig.sWNNM.nIter
             mBMInput = mY;
         end
         [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, true);
-        vNPatchesPerFrame = histcounts(mGroupIndices(:,:,3), 1:f+1);
+        vNPatchesPerFrame = histcounts(mGroupIndices(:,:,3), 1:f+1) / size(mGroupIndices, 1);
         
         % next iterations will have less noise - so use less patches in group:
-        sConfig.sBlockMatching.maxGroupSize = sConfig.sBlockMatching.maxGroupSize - 10; % TODO: do we need this? from original WNNM code
+        sConfig.sBlockMatching.maxGroupSize = max(sConfig.sBlockMatching.maxGroupSize - 10, 40);
     end
     
     % WNNM per group and image aggregation:
