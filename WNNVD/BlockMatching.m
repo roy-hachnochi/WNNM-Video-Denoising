@@ -33,8 +33,10 @@ if isWaitbar
 end
 for iRef = 1:NRefPatches
     %% Find nearest patches per frame
-    mSearchPatchInds =  zeros(f*k, 3); % indices of most similar patches per frame
-    vSearchPatchDists = zeros(f*k, 1); % distances of most similar patches per frame
+    startFrame = max(refFrame - sConfig.sBlockMatching.searchWindowT, 1);
+    endFrame =   min(refFrame + sConfig.sBlockMatching.searchWindowT, f);
+    mSearchPatchInds =  zeros((endFrame - startFrame + 1)*k, 3); % indices of most similar patches per frame
+    vSearchPatchDists = zeros((endFrame - startFrame + 1)*k, 1); % distances of most similar patches per frame
     
     vRefPatchInds = [mRefPatchInds(iRef, :), refFrame]; % include frame
     ind = 0;
@@ -46,7 +48,7 @@ for iRef = 1:NRefPatches
  
     % Forward predictive block matching:
     mCurPatchInds = mFirstInds;
-    for iFrame = refFrame+1:f
+    for iFrame = refFrame+1:endFrame
         ind = ind + 1;
         [mCurPatchInds, vCurPatchDists] = BlockMatchingPred(mX, vRefPatchInds, mCurPatchInds, iFrame, sConfig);
         mSearchPatchInds(ind*k + (1:k), :) = mCurPatchInds;
@@ -55,16 +57,17 @@ for iRef = 1:NRefPatches
     
     % Backward predictive block matching:
     mCurPatchInds = mFirstInds;
-    for iFrame = refFrame-1:-1:1
+    for iFrame = refFrame-1:-1:startFrame
         ind = ind + 1;
         [mCurPatchInds, vCurPatchDists] = BlockMatchingPred(mX, vRefPatchInds, mCurPatchInds, iFrame, sConfig);
         mSearchPatchInds(ind*k + (1:k), :) = mCurPatchInds;
         vSearchPatchDists(ind*k + (1:k)) =   vCurPatchDists;
-    end  
+    end
+    
     %% Find nearest patches from entire patch array:
     [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K);
-    mGroupIndices(iRef, 1:min(K,f*k), :) = mSearchPatchInds(vNearestInds, :);
-    vNumNeighbors(iRef) =         sum(vNearestDists <= sConfig.sBlockMatching.distTh);
+    mGroupIndices(iRef, 1:min(K,(endFrame - startFrame + 1)*k), :) = mSearchPatchInds(vNearestInds, :);
+    vNumNeighbors(iRef) = sum(vNearestDists <= sConfig.sBlockMatching.distTh);
     
     if isWaitbar && (mod(iRef - 1, 20) == 0)
         waitbar(iRef/NRefPatches, wb);

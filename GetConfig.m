@@ -27,8 +27,9 @@ sConfig.sBlockMatching.maxNeighborsFrame = 70;   % Maximal number of nearest nei
 sConfig.sBlockMatching.maxGroupSize =      200;  % Maximal group size (number of patches) per reference patch
 sConfig.sBlockMatching.searchWindowNP =    30;   % Non-predictive search window
 sConfig.sBlockMatching.searchStrideNP =    2;    % Non-predictive stride between search patches
-sConfig.sBlockMatching.searchWindowP =     3;    % Predictive search window.
+sConfig.sBlockMatching.searchWindowP =     3;    % Predictive search window
 sConfig.sBlockMatching.searchStrideP =     3;    % Predictive stride between search patches
+sConfig.sBlockMatching.searchWindowT =     10;   % Temporal search window (frames)
 sConfig.sBlockMatching.metric =            'l2'; % Metric of distance between blocks ('l1' or 'l2')
 sConfig.sBlockMatching.distTh =            50;   % Threshold for maximal distance between grouped patches
 

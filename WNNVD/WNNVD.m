@@ -30,27 +30,41 @@ end
 mY =             mX;
 mGroupedPixels = false(size(mX));
 processed =      0;
-nextRefFrame =   ceil(f/2);
+refFrame =       ceil(f/2);
 iter =           1;
 while (iter <= sConfig.sWNNM.nFrameIter) && ((1 - processed)*100 > sConfig.sWNNM.maxUngrouped)
     % run iteration on single reference frame:
     tStart = tic;
     [mY, mGroupedPixels, vNPatchesPerFrame] = ...
-        WNNVDRefFrame(mY, mPreDenoised, mGroupedPixels, nextRefFrame, sConfig);
+        WNNVDRefFrame(mY, mPreDenoised, mGroupedPixels, refFrame, sConfig);
     itTime = toc(tStart);
     
     % update log:
     processed = mean(mGroupedPixels(:));    
     if saveLog
-        sLog = UpdateLog(sLog, nextRefFrame, processed, vNPatchesPerFrame, itTime);
+        sLog = UpdateLog(sLog, refFrame, processed, vNPatchesPerFrame, itTime);
     end
     
-    % choose next reference frame based on the one with most ungrouped pixels:
+    % choose next reference frame:
     vNumGrouped = squeeze(sum(mGroupedPixels, [1, 2]));
-    [~, nextRefFrame] = min(vNumGrouped);
+    refFrame = ChooseNextRefFrame(refFrame, vNumGrouped);
     
     fprintf("it: %d | Processed: %.2f%% | Time: %.2f\n", iter, processed*100, itTime);
     iter = iter + 1;
 end
+
+end
+
+%% ==========================================================================================================
+function nextRefFrame = ChooseNextRefFrame(refFrame, vNumGrouped)
+% --------------------------------------------------------------------------------------------------------- %
+% Chooses next reference frame based on the one with most ungrouped pixels and which is furthest from current
+% reference frame.
+% --------------------------------------------------------------------------------------------------------- %
+
+minNumGrouped = min(vNumGrouped);
+nextRefFrameOptions = find(vNumGrouped == minNumGrouped);
+[~, nextFrameInd] = max(abs(nextRefFrameOptions - refFrame)); % frame which is furthest from current
+nextRefFrame = nextRefFrameOptions(nextFrameInd);
 
 end
