@@ -31,7 +31,7 @@ sConfig.sBlockMatching.searchWindowP =     3;    % Predictive search window
 sConfig.sBlockMatching.searchStrideP =     3;    % Predictive stride between search patches
 sConfig.sBlockMatching.searchWindowT =     10;   % Temporal search window (frames)
 sConfig.sBlockMatching.metric =            'l2'; % Metric of distance between blocks ('l1' or 'l2')
-sConfig.sBlockMatching.distTh =            50;   % Threshold for maximal distance between grouped patches
+sConfig.sBlockMatching.distTh =            25;   % Threshold for maximal distance between grouped patches
 
 assert(sConfig.sBlockMatching.refStride <= sConfig.sBlockMatching.patchSize, ...
     "Stride must by smaller or equal to Patch Size in order to cover the entire image");

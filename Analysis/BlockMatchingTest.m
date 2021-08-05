@@ -1,10 +1,10 @@
 % Test for BlockMatching function:
 
 %% Parameters:
-refFrame =        2;
+refFrame =        10;
 refPatchTestInd = 700;
 FACE_ALPHA =      0.3;
-nPatchesToPlot =  14;
+nPatchesToPlot =  7;
 maxFrames =       20;
 
 %% Initializations:
@@ -42,26 +42,26 @@ title(['Number of Matched Patches Per Frame',newline,'Reference Frame: ',num2str
 
 % Plot the patches themselves:
 figure;
-subplot(3, ceil(nPatchesToPlot/2), ceil(ceil(nPatchesToPlot/2)/2));
+subplot(3, nPatchesToPlot, ceil(nPatchesToPlot/2));
 refRow =   mGroupIndices(1, 1, 1);
 refCol =   mGroupIndices(1, 1, 2);
 refFrame = mGroupIndices(1, 1, 3);
 imshow(uint8(mX(refRow + (0:(p-1)), refCol + (0:(p-1)), refFrame)));
 title('Reference Frame');
-for iPlot = 1:nPatchesToPlot
-    if iPlot <= ceil(nPatchesToPlot/2) % show nearest patches
+for iPlot = 1:2*nPatchesToPlot
+    if iPlot <= nPatchesToPlot % show nearest patches
         iPatch = iPlot;
         sTitle = 'Nearest Frames in Group';
     else % show furthest patches
-        iPatch = vNumNeighbors(1) - (nPatchesToPlot - iPlot);
+        iPatch = vNumNeighbors(1) - (nPatchesToPlot*2 - iPlot);
         sTitle = 'Furthest Frames in Group';
     end
     row =   mGroupIndices(1, iPatch, 1);
     col =   mGroupIndices(1, iPatch, 2);
     frame = mGroupIndices(1, iPatch, 3);
-    subplot(3, ceil(nPatchesToPlot/2), ceil(nPatchesToPlot/2) + iPlot);
+    subplot(3, nPatchesToPlot, nPatchesToPlot + iPlot);
     imshow(uint8(mX(row + (0:(p-1)), col + (0:(p-1)), frame)));
-    if (mod(iPlot, ceil(nPatchesToPlot/2)) == ceil(ceil(nPatchesToPlot/2)/2))
+    if (mod(iPlot, nPatchesToPlot) == ceil(nPatchesToPlot/2))
         title(sTitle);
     end
 end
