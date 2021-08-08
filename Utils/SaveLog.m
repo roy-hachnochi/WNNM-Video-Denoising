@@ -9,8 +9,8 @@ function [] = SaveLog(sLog, logPath)
 
 warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
-logDir = split(logPath, '/');
-logDir = join(logDir(1:end-1), '/');
+logDir = split(logPath, filesep);
+logDir = join(logDir(1:end-1), filesep);
 mkdir(logDir{1});
 
 save(logPath, 'sLog');

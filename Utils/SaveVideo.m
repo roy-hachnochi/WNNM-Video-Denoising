@@ -15,8 +15,8 @@ warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
 [~, ~, ~, f] = size(mFrames);
 vidName = split(vidPath, '.');
-vidDir = split(vidName{1}, '/');
-vidDir = join(vidDir(1:end-1), '/');
+vidDir = split(vidName{1}, filesep);
+vidDir = join(vidDir(1:end-1), filesep);
 mkdir(vidDir{1});
 
 if (f == 1)

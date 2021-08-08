@@ -1,4 +1,6 @@
-% Test for BlockMatching function:
+% ========================================================================================================= %
+% Test for BlockMatching function
+% ========================================================================================================= %
 
 %% Parameters:
 refFrame =        10;
@@ -11,7 +13,7 @@ maxFrames =       20;
 sConfig = GetConfig();
 sConfig.sTest.maxFrames = maxFrames;
 p = sConfig.sBlockMatching.patchSize;
-mX = LoadVideo(sConfig.sTest);
+mX = LoadVideo(sConfig.sTest.vidInPath, sConfig.sTest);
 mX = single(squeeze(mX(:,:,1,:)));
 [h, w, ~] = size(mX);
 

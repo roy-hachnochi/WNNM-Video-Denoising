@@ -1,8 +1,9 @@
-function [mFrames, frameRate] = LoadVideo(sTestConfig)
+function [mFrames, frameRate] = LoadVideo(vidPath, sTestConfig)
 % --------------------------------------------------------------------------------------------------------- %
 % Loads video frames.
 %
 % Input:
+%   vidPath -     Video input path.
 %   sTestConfig - Struct containing input video parameters.
 %
 % Output:
@@ -10,13 +11,13 @@ function [mFrames, frameRate] = LoadVideo(sTestConfig)
 %   frameRate - Frame rate of video.
 % --------------------------------------------------------------------------------------------------------- %
 
-strArr = split(sTestConfig.vidInPath, '.');
+strArr = split(vidPath, '.');
 if strcmpi(strArr{end}, 'png') || strcmpi(strArr{end}, 'jpg') || strcmpi(strArr{end}, 'jpeg')
     % video is actually an image
-    mOrigFrames = imread(sTestConfig.vidInPath);
+    mOrigFrames = imread(vidPath);
     frameRate = 1;
 else
-    vidObj = VideoReader(sTestConfig.vidInPath);
+    vidObj = VideoReader(vidPath);
     mOrigFrames = read(vidObj);
     frameRate = vidObj.FrameRate;
 end

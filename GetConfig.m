@@ -8,9 +8,8 @@ function sConfig = GetConfig()
 %% Test video:
 sConfig.sTest.vidInPath =     'xylophone.mp4';              % Video input path for testing
 sConfig.sTest.vidOutPath =    'Results/Clean/xylophone';    % Video output path
-sConfig.sTest.vidNoisedPath = 'Results/Noised/xylophone';   % Noised video output path
-sConfig.sTest.logPath =       'Results/Logs/xylophone';     % Noised video output path
 sConfig.sTest.maxFrames =     20;                           % Maximal number of frames (for runtime)
+sConfig.sTest.logPath =       'Results/Logs/xylophone';     % Log output path
 sConfig.sTest.isGray =        true;                         % Use grayscale video or RGB
 
 assert(sConfig.sTest.isGray, "TODO: TEMP! implement solution for RGB");
