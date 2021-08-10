@@ -58,6 +58,11 @@ for iVid = 1:nVids
     %% Load video:
     [mOrigVid, frameRate] = LoadVideo(inPaths{iVid}, sConfig.sTest);
     [h, w, ch, f] = size(mOrigVid);
+    
+    vidName = split(inPaths{iVid}, filesep); % split from directory
+    vidName = split(vidName{end}, '.'); % split from extension
+    vidName = split(vidName{1}, '_'); % split from additions if exist
+    vidName = vidName{1};
 
     %% Add noise:
     if ~isNoised
@@ -88,6 +93,9 @@ for iVid = 1:nVids
         iVid, nVids, sLog.psnr, sLog.ssim, sLog.time/60);
 
     %% Save results:
+    sLog.alg = alg;
+    sLog.vidName = vidName;
+    sLog.noiseStd = sConfig.sNoise.sigma;
     SaveVideo(mY, frameRate, outPaths{iVid});
     if saveLog
         SaveLog(sLog, logPaths{iVid})

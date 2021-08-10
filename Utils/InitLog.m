@@ -20,6 +20,9 @@ sLog.mNPatchesPerFrame = zeros([maxIt, nFrames]);   % Number of chosen patches p
 sLog.psnr =              0;                         % Final PSNR
 sLog.ssim =              0;                         % Final SSIM
 sLog.time =              0;                         % Total runtime [sec]
+sLog.alg =               'WNNVD';                   % Algorithm used for denoising
+sLog.vidName =           '';                        % Name of denoised video
+sLog.noiseStd =          sConfig.sNoise.sigma;      % Noise STD of input video
 sLog.sConfig =           sConfig;                   % Algorithm parameters
 
 end
