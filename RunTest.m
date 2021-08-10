@@ -76,13 +76,13 @@ for iVid = 1:nVids
         mX = squeeze(mX(:,:,1,:));
         tStartAlg = tic;
         [~, mY] = VBM3D(mX, sConfig.sNoise.sigma, sConfig.sTest.maxFrames);
-        sLog.time = toc(tStartAlg);
+        sLog.timePerFrame = toc(tStartAlg)/f;
         mY = reshape(uint8(mY*255), [h, w, ch, f]);
     else % WNNVD/WNNID differ only by parameter change
         mX = single(squeeze(mX(:,:,1,:)));
         tStartAlg = tic;
         [mY, sLog] = WNNVD(mX, sConfig);
-        sLog.time = toc(tStartAlg);
+        sLog.timePerFrame = toc(tStartAlg)/f;
         mY = reshape(uint8(mY), [h, w, ch, f]);
     end
 
