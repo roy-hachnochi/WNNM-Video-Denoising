@@ -4,10 +4,11 @@
 
 %% Parameters:
 refFrame =        10;
-refPatchTestInd = 700;
+refPatchTestInd = 2640;
 FACE_ALPHA =      0.3;
 nPatchesToPlot =  7;
 maxFrames =       20;
+frameToPlot =     10;
 
 %% Initializations:
 sConfig = GetConfig();
@@ -26,9 +27,9 @@ mRefPatchInds = GetRefPatchInds(h, w, mSkip, sConfig);
 % Display matched patches for same reference frame, and show histogram of patches per frames:
 figure;
 subplot(1,2,1);
-imshow(uint8(mX(:,:,refFrame)));   hold on;
-for iPatch = 1:size(mGroupIndices, 2)
-    if (mGroupIndices(1, iPatch, 3) == refFrame) % display only current frame's patches
+imshow(uint8(mX(:,:,frameToPlot)));   hold on;
+for iPatch = 1:vNumNeighbors(1)
+    if (mGroupIndices(1, iPatch, 3) == frameToPlot) % display only current frame's patches
         rectangle('Position', [mGroupIndices(1, iPatch, 2), mGroupIndices(1, iPatch, 1), p, p],...
                  'EdgeColor', 'c', 'FaceColor', [0, 1, 1, FACE_ALPHA]);
     end
@@ -38,9 +39,10 @@ rectangle('Position', [mRefPatchInds(refPatchTestInd, 2), mRefPatchInds(refPatch
 title('Matched Patches in Single Frame');
 
 subplot(1,2,2);
-histogram(mGroupIndices(1,:,3), 1:(size(mX,3)+1));  grid on;
+histogram(mGroupIndices(1,1:vNumNeighbors(1),3), 1:(size(mX,3)+1));  grid on;
 xlabel('frame');    ylabel('# patches');
-title(['Number of Matched Patches Per Frame',newline,'Reference Frame: ',num2str(refFrame)]);
+title(['Number of Matched Patches Per Frame',newline,'Reference Frame: ',num2str(refFrame),newline,...
+    'Total number of matched patches: ',num2str(vNumNeighbors(1))]);
 
 % Plot the patches themselves:
 figure;
@@ -58,6 +60,9 @@ for iPlot = 1:2*nPatchesToPlot
     else % show furthest patches
         iPatch = vNumNeighbors(1) - (nPatchesToPlot*2 - iPlot);
         sTitle = 'Furthest Frames in Group';
+    end
+    if (iPatch <= 1) || (iPatch > vNumNeighbors(1))
+        continue;
     end
     row =   mGroupIndices(1, iPatch, 1);
     col =   mGroupIndices(1, iPatch, 2);

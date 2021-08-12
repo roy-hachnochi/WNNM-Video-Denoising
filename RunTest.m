@@ -36,7 +36,7 @@ if ~exist('saveLog', 'var') || isempty(saveLog)
 end
 noisedExists = (exist('noisedPaths', 'var') && ~isempty(noisedPaths));
 
-if ischar(noisedPaths) || isstring(noisedPaths)
+if noisedExists && (ischar(noisedPaths) || isstring(noisedPaths))
     noisedPaths = {char(noisedPaths)};
 end
 if ischar(origPaths) || isstring(origPaths)

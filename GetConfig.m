@@ -6,11 +6,11 @@ function sConfig = GetConfig()
 % --------------------------------------------------------------------------------------------------------- %
 
 %% Test video:
-sConfig.sTest.vidInPath =     'xylophone.mp4';              % Video input path for testing
-sConfig.sTest.vidOutPath =    'Results/Clean/xylophone';    % Video output path
-sConfig.sTest.maxFrames =     20;                           % Maximal number of frames (for runtime)
-sConfig.sTest.logPath =       'Results/Logs/xylophone';     % Log output path
-sConfig.sTest.isGray =        true;                         % Use grayscale video or RGB
+sConfig.sTest.vidInPath =     'Videos/gbicycle.avi'; % Video input path for testing
+sConfig.sTest.vidOutPath =    'Results/temp.avi'; % Video output path
+sConfig.sTest.maxFrames =     20;                              % Maximal number of frames (for runtime)
+sConfig.sTest.logPath =       'Results/temp';      % Log output path
+sConfig.sTest.isGray =        true;                            % Use grayscale video or RGB
 
 assert(sConfig.sTest.isGray, "TODO: TEMP! implement solution for RGB");
 
@@ -23,14 +23,14 @@ sConfig.sNoise.snp =     0.00;                  % Salt & pepper noise density
 sConfig.sBlockMatching.refStride =         7;    % Stride between reference pathces
 sConfig.sBlockMatching.patchSize =         8;    % Patch size
 sConfig.sBlockMatching.maxNeighborsFrame = 70;   % Maximal number of nearest neighbors per frame
-sConfig.sBlockMatching.maxGroupSize =      200;  % Maximal group size (number of patches) per reference patch
+sConfig.sBlockMatching.maxGroupSize =      300;  % Maximal group size (number of patches) per reference patch
 sConfig.sBlockMatching.searchWindowNP =    30;   % Non-predictive search window
 sConfig.sBlockMatching.searchStrideNP =    2;    % Non-predictive stride between search patches
 sConfig.sBlockMatching.searchWindowP =     3;    % Predictive search window
 sConfig.sBlockMatching.searchStrideP =     3;    % Predictive stride between search patches
 sConfig.sBlockMatching.searchWindowT =     10;   % Temporal search window (frames)
 sConfig.sBlockMatching.metric =            'l2'; % Metric of distance between blocks ('l1' or 'l2')
-sConfig.sBlockMatching.distTh =            25;   % Threshold for maximal distance between grouped patches
+sConfig.sBlockMatching.distTh =            30;   % Threshold for maximal distance between grouped patches
 
 assert(sConfig.sBlockMatching.refStride <= sConfig.sBlockMatching.patchSize, ...
     "Stride must by smaller or equal to Patch Size in order to cover the entire image");

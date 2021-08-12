@@ -6,7 +6,7 @@ inPath =     'Videos';
 outPath =    fullfile('Videos','Noised');
 vidNames =   {'gbicycle', 'gflower', 'gmissa', 'gsalesman', 'gstennis'};
 imNames =    {'lena'};
-vNoiseSigs = [10, 20, 40];
+vNoiseSigs = [10, 20, 30];
 sConfig =    GetConfig();
 
 for noiseSig = vNoiseSigs
