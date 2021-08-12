@@ -70,20 +70,22 @@ function [mGroup, noiseSigmaEst] = ExtractGroup(mX, mNoised, mGroupIndices, p, n
 %   noiseSigmaEst - Estimated noise STD for reference patch.
 % --------------------------------------------------------------------------------------------------------- %
 
-K = size(mGroupIndices, 1);
-mGroup = zeros(K, p^2);
-for iPatch = 1:K
-    row =   mGroupIndices(iPatch, 1);
-    col =   mGroupIndices(iPatch, 2);
-    frame = mGroupIndices(iPatch, 3);
-    mGroup(iPatch, :) = reshape(mX(row + (0:(p-1)), col + (0:(p-1)), frame), [1, p^2]);
-    
-    % estimate noise based on first (reference) patch:
-    if (iPatch == 1)
-        vNoisedPatch = reshape(mNoised(row + (0:(p-1)), col + (0:(p-1)), frame), [1, p^2]);
-        noiseSigmaEst = sqrt(abs(mean((mGroup(1, :) - vNoisedPatch).^2) - noiseSigma^2));
-    end
-end
+[h, w, f] = size(mX);
+
+% top-left indices of each patch in group:
+vPatchStartInds = sub2ind([h, w, f], mGroupIndices(:,1), mGroupIndices(:,2), mGroupIndices(:,3)); % [K, 1]
+
+% relative patch indices in frame from top-left corner:
+mSinglePatchInds = (0:p-1)' + h*(0:p-1); % [p, p]
+mSinglePatchInds = reshape(mSinglePatchInds, [1, size(mSinglePatchInds)]); % [1, p, p]
+
+% extract patches:
+mPatches = mX(vPatchStartInds + repmat(mSinglePatchInds, [length(vPatchStartInds),1,1])); % [K, p, p]
+mGroup = reshape(mPatches, [size(mPatches,1), p^2]); % [K, p^2]
+
+% estimate noise based on reference patch:
+vNoisedPatch = reshape(mNoised(vPatchStartInds(1) + mSinglePatchInds), [1, p^2]);
+noiseSigmaEst = sqrt(abs(mean((mGroup(1, :) - vNoisedPatch).^2) - noiseSigma^2));
 
 end
 
@@ -104,14 +106,18 @@ function [mY, mCount] = Aggregate(mY, mCount, mGroup, mGroupIndices, p)
 %   mCount - 3D array of updated counter for grouped video pixels. [h, w, f]
 % --------------------------------------------------------------------------------------------------------- %
 
-K = size(mGroupIndices, 1);
-for iPatch = 1:K
-    row =   mGroupIndices(iPatch, 1);
-    col =   mGroupIndices(iPatch, 2);
-    frame = mGroupIndices(iPatch, 3);
-    mY(row + (0:(p-1)), col + (0:(p-1)), frame) = mY(row + (0:(p-1)), col + (0:(p-1)), frame) + ...
-        reshape(mGroup(iPatch, :), [p, p]);
-    mCount(row + (0:(p-1)), col + (0:(p-1)), frame) = mCount(row + (0:(p-1)), col + (0:(p-1)), frame) + 1;
+[h, w, f] = size(mY);
+
+% top-left indices of each patch in group:
+vPatchStartInds = sub2ind([h, w, f], mGroupIndices(:,1), mGroupIndices(:,2), mGroupIndices(:,3)); % [K, 1]
+
+% relative patch indices in frame from top-left corner:
+mSinglePatchInds = (0:p-1)' + h*(0:p-1); % [p, p]
+
+for iOffset = 1:numel(mSinglePatchInds)
+    offset = mSinglePatchInds(iOffset);
+    mY(vPatchStartInds + offset) = mY(vPatchStartInds + offset) + mGroup(:, iOffset);
+    mCount(vPatchStartInds + offset) = mCount(vPatchStartInds + offset) + 1;
 end
 
 end
