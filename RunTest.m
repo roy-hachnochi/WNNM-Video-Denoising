@@ -1,4 +1,5 @@
-function [] = RunTest(sConfig, alg, noisedPaths, origPaths, outPaths, logPaths, noiseSig, saveVid, saveLog)
+function [vPSNR, vSSIM, vTimePerFrame] = ...
+    RunTest(sConfig, alg, noisedPaths, origPaths, outPaths, logPaths, noiseSig, saveVid, saveLog)
 % --------------------------------------------------------------------------------------------------------- %
 % Runs a video denoising test on a chosen video/set of videos.
 %
@@ -10,8 +11,13 @@ function [] = RunTest(sConfig, alg, noisedPaths, origPaths, outPaths, logPaths, 
 %   outPaths -    (optional) Output video paths for saving (default: use path from sConfig).
 %   logPaths -    (optional) Log paths for saving (default: use path from sConfig).
 %   noiseSig -    (optional) Gaussian noise STD (default: use noiseSig from sConfig).
-%   saveVid -     (optional) Save output video (default: true).
-%   saveLog -     (optional) Save log struct with run statistics (default: true).
+%   saveVid -     (optional) Save output video (default: false).
+%   saveLog -     (optional) Save log struct with run statistics (default: false).
+%
+% Output:
+%   vPSNR -         (optional) PSNR per test.
+%   vSSIM -         (optional) SSIM per test.
+%   vTimePerFrame - (optional) Algorithm runtime per frame per test.
 % --------------------------------------------------------------------------------------------------------- %
 
 %% Default initializations:
@@ -33,10 +39,10 @@ if exist('noiseSig', 'var') && ~isempty(noiseSig)
     sConfig.sNoise.sigma = noiseSig;
 end
 if ~exist('saveVid', 'var') || isempty(saveVid)
-    saveVid = true;
+    saveVid = false;
 end
 if ~exist('saveLog', 'var') || isempty(saveLog)
-    saveLog = true;
+    saveLog = false;
 end
 noisedExists = (exist('noisedPaths', 'var') && ~isempty(noisedPaths));
 
@@ -53,8 +59,18 @@ if ischar(logPaths) || isstring(logPaths)
     logPaths = {char(logPaths)};
 end
 
-%% Argument checks:
 nVids = length(origPaths);
+if nargout >= 1
+    vPSNR = zeros(1, nVids);
+end
+if nargout >= 2
+    vSSIM = zeros(1, nVids);
+end
+if nargout >= 3
+    vTimePerFrame = zeros(1, nVids);
+end
+
+%% Argument checks:
 assert(ismember(alg, {'WNNVD', 'VBM3D', 'WNNID'}), 'Illegal alg.');
 assert(sConfig.sNoise.sigma > 0, 'Illegal noise STD.');
 if saveVid
@@ -76,10 +92,6 @@ end
 for iVid = 1:nVids
     %% Load video:
     [mOrigVid, frameRate] = LoadVideo(origPaths{iVid}, sConfig.sTest);
-    if noisedExists
-        [mNoised, frameRate] = LoadVideo(noisedPaths{iVid}, sConfig.sTest);
-        assert(all(size(mNoised) == size(mOrigVid)), 'Noised and original videos must be of same size.');
-    end
     [h, w, ch, f] = size(mOrigVid);
     
     vidName = split(origPaths{iVid}, filesep); % split from directory
@@ -89,7 +101,8 @@ for iVid = 1:nVids
 
     %% Add noise:
     if noisedExists
-        mX = mNoised;
+        [mX, frameRate] = LoadVideo(noisedPaths{iVid}, sConfig.sTest);
+        assert(all(size(mX) == size(mOrigVid)), 'Noised and original videos must be of same size.');
     else
         mX = VideoNoise(mOrigVid, sConfig.sNoise);
     end
@@ -124,6 +137,16 @@ for iVid = 1:nVids
     end
     if saveLog
         SaveLog(sLog, logPaths{iVid})
+    end
+    
+    if nargout >= 1
+        vPSNR(iVid) = sLog.psnr;
+    end
+    if nargout >= 2
+        vSSIM(iVid) = sLog.ssim;
+    end
+    if nargout >= 3
+        vTimePerFrame(iVid) = sLog.timePerFrame;
     end
 end
 

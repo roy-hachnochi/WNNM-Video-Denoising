@@ -22,8 +22,8 @@ sConfig.sNoise.snp =     0.00;                  % Salt & pepper noise density
 %% Block matching params:
 sConfig.sBlockMatching.refStride =         7;    % Stride between reference pathces
 sConfig.sBlockMatching.patchSize =         8;    % Patch size
-sConfig.sBlockMatching.maxNeighborsFrame = 70;   % Maximal number of nearest neighbors per frame
-sConfig.sBlockMatching.maxGroupSize =      300;  % Maximal group size (number of patches) per reference patch
+sConfig.sBlockMatching.maxNeighborsFrame = 30;   % Maximal number of nearest neighbors per frame
+sConfig.sBlockMatching.maxGroupSize =      150;  % Maximal group size (number of patches) per reference patch
 sConfig.sBlockMatching.searchWindowNP =    30;   % Non-predictive search window
 sConfig.sBlockMatching.searchStrideNP =    2;    % Non-predictive stride between search patches
 sConfig.sBlockMatching.searchWindowP =     3;    % Predictive search window
