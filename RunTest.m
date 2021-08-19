@@ -1,4 +1,4 @@
-function [] = RunTest(sConfig, alg, noisedPaths, origPaths, outPaths, logPaths, noiseSig, saveLog)
+function [] = RunTest(sConfig, alg, noisedPaths, origPaths, outPaths, logPaths, noiseSig, saveVid, saveLog)
 % --------------------------------------------------------------------------------------------------------- %
 % Runs a video denoising test on a chosen video/set of videos.
 %
@@ -10,6 +10,7 @@ function [] = RunTest(sConfig, alg, noisedPaths, origPaths, outPaths, logPaths, 
 %   outPaths -    (optional) Output video paths for saving (default: use path from sConfig).
 %   logPaths -    (optional) Log paths for saving (default: use path from sConfig).
 %   noiseSig -    (optional) Gaussian noise STD (default: use noiseSig from sConfig).
+%   saveVid -     (optional) Save output video (default: true).
 %   saveLog -     (optional) Save log struct with run statistics (default: true).
 % --------------------------------------------------------------------------------------------------------- %
 
@@ -30,6 +31,9 @@ if ~exist('logPaths', 'var') || isempty(logPaths)
 end
 if exist('noiseSig', 'var') && ~isempty(noiseSig)
     sConfig.sNoise.sigma = noiseSig;
+end
+if ~exist('saveVid', 'var') || isempty(saveVid)
+    saveVid = true;
 end
 if ~exist('saveLog', 'var') || isempty(saveLog)
     saveLog = true;
@@ -52,9 +56,10 @@ end
 %% Argument checks:
 nVids = length(origPaths);
 assert(ismember(alg, {'WNNVD', 'VBM3D', 'WNNID'}), 'Illegal alg.');
-assert(length(outPaths) == nVids,...
-    'Unmatching number of input/output paths.')
 assert(sConfig.sNoise.sigma > 0, 'Illegal noise STD.');
+if saveVid
+    assert(length(outPaths) == nVids, 'Unmatching number of input/output paths.')
+end
 if saveLog
     assert(length(logPaths) == nVids, 'Unmatching number of input/log paths.')
 end
@@ -114,7 +119,9 @@ for iVid = 1:nVids
     sLog.alg = alg;
     sLog.vidName = vidName;
     sLog.noiseStd = sConfig.sNoise.sigma;
-    SaveVideo(mY, frameRate, outPaths{iVid});
+    if saveVid
+        SaveVideo(mY, frameRate, outPaths{iVid});
+    end
     if saveLog
         SaveLog(sLog, logPaths{iVid})
     end

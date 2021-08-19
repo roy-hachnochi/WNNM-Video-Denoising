@@ -50,6 +50,6 @@ for noiseSig = vNoiseSigs
             end
         end
 
-        RunTest(sConfig, algs{iAlg}, noisedPaths, origPaths, outPaths, logPaths, noiseSig, true);
+        RunTest(sConfig, algs{iAlg}, noisedPaths, origPaths, outPaths, logPaths, noiseSig, true, true);
     end
 end

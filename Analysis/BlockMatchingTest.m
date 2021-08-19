@@ -3,6 +3,7 @@
 % ========================================================================================================= %
 
 %% Parameters:
+vidInPath =       'Videos/gbicycle.avi';
 refFrame =        10;
 refPatchTestInd = 2640;
 FACE_ALPHA =      0.3;
@@ -12,6 +13,7 @@ frameToPlot =     10;
 
 %% Initializations:
 sConfig = GetConfig();
+sConfig.sTest.vidInPath = vidInPath;
 sConfig.sTest.maxFrames = maxFrames;
 p = sConfig.sBlockMatching.patchSize;
 mX = LoadVideo(sConfig.sTest.vidInPath, sConfig.sTest);
