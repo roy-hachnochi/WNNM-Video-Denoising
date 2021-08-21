@@ -3,12 +3,12 @@
 % ========================================================================================================= %
 
 %% Parameters:
-vidInPath =       'Videos/gbicycle.avi';
-refFrame =        10;
-refPatchTestInd = 2640;
+vidInPath =       'Videos/gstennis.avi';'Videos/gbicycle.avi';
+refFrame =        3;
+refPatchTestInd = 327;
 FACE_ALPHA =      0.3;
 nPatchesToPlot =  7;
-nFramesToPlot =   3;
+nFramesToPlot =   4;
 
 %% Initializations:
 sConfig = GetConfig();
@@ -23,6 +23,11 @@ mNP = sConfig.sBlockMatching.searchWindowNP;
 p =   sConfig.sBlockMatching.patchSize;
 
 %% Run BlockMatching:
+mXorig = mX;
+mPreDenoised = zeros(size(mX));
+for frame = 1:sConfig.sTest.maxFrames
+    mX(:,:,frame) = PreprocessFrame(mX(:,:,frame));
+end
 mSkip = false([h, w]);
 mRefPatchInds = GetRefPatchInds(h, w, mSkip, sConfig);
 [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds(refPatchTestInd, :), refFrame, sConfig);
@@ -71,5 +76,5 @@ for iframe = 1:(nFramesToPlot-1)
     
     title(['Frame #',num2str(curFrame)]);
 end
-
+sgtitle(["# of Ref patches: ",num2str(size(mRefPatchInds,1))])
 linkaxes;

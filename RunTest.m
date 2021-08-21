@@ -39,7 +39,7 @@ if exist('noiseSig', 'var') && ~isempty(noiseSig)
     sConfig.sNoise.sigma = noiseSig;
 end
 if ~exist('saveVid', 'var') || isempty(saveVid)
-    saveVid = false;
+    saveVid = true;
 end
 if ~exist('saveLog', 'var') || isempty(saveLog)
     saveLog = false;
