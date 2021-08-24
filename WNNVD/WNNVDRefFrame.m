@@ -16,7 +16,6 @@ function [mY, mGroupedPixels, vNPatchesPerFrame] = ...
 %   vNPatchesPerFrame - Number of chosen patches per frame. [1, f]
 % --------------------------------------------------------------------------------------------------------- %
 
-
 [h, w, f] = size(mX);
 
 %% Get reference patch indices:
@@ -38,7 +37,7 @@ for iter = 1:sConfig.sWNNM.nIter
         else
             mBMInput = mY;
         end
-        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, true);
+        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
         vNPatchesPerFrame = histcounts(mGroupIndices(:,:,3), 1:f+1) / size(mGroupIndices, 1);
         
         % next iterations will have less noise - so use less patches in group:

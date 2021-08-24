@@ -5,14 +5,11 @@ function sConfig = GetConfig()
 % TODO: Set params.
 % --------------------------------------------------------------------------------------------------------- %
 
-%% Test video:
-sConfig.sTest.vidInPath =     'Videos/gstennis.avi'; % Video input path for testing
-sConfig.sTest.vidOutPath =    'Results/temp.avi'; % Video output path
-sConfig.sTest.maxFrames =     10;                              % Maximal number of frames (for runtime)
-sConfig.sTest.logPath =       'Results/temp';      % Log output path
-sConfig.sTest.isGray =        true;                            % Use grayscale video or RGB
+%% Input video properties:
+sConfig.sVidProperties.maxFrames = 20;   % Maximal number of frames (to reduce runtime)
+sConfig.sVidProperties.isGray =    true; % Use grayscale video or RGB
 
-assert(sConfig.sTest.isGray, "TODO: TEMP! implement solution for RGB");
+assert(sConfig.sVidProperties.isGray, "TODO: TEMP! implement solution for RGB");
 
 %% Noise types:
 sConfig.sNoise.isPoiss = false;                 % Add Poisson noise or not

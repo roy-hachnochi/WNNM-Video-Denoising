@@ -13,10 +13,9 @@ frameToPlot =     10;
 
 %% Initializations:
 sConfig = GetConfig();
-sConfig.sTest.vidInPath = vidInPath;
-sConfig.sTest.maxFrames = maxFrames;
+sConfig.sVidProperties.maxFrames = maxFrames;
 p = sConfig.sBlockMatching.patchSize;
-mX = LoadVideo(sConfig.sTest.vidInPath, sConfig.sTest);
+mX = LoadVideo(vidInPath, sConfig.sVidProperties);
 mX = single(squeeze(mX(:,:,1,:)));
 [h, w, ~] = size(mX);
 

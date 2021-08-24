@@ -13,9 +13,6 @@ function [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds, refFr
 % Output:
 %   mGroupIndices - 3D array containing upper-left indices of patches in group per reference patch. [N, K, 3]
 %   vNumNeighbors - Array containing number of effective neighbors per reference patch. [N, 1]
-%
-% TODO:
-%   Use only reference patches as legal patches in group.
 % --------------------------------------------------------------------------------------------------------- %
 
 if ~exist('isWaitbar', 'var') || isempty(isWaitbar)

@@ -3,18 +3,20 @@
 % ========================================================================================================= %
 
 %% Parameters:
-vidInPath =       'Videos/gstennis.avi';'Videos/gbicycle.avi';
+vidInPath =       'Videos/gstennis.avi';
 refFrame =        3;
 refPatchTestInd = 327;
 FACE_ALPHA =      0.3;
 nPatchesToPlot =  7;
 nFramesToPlot =   4;
+noiseSigma =      20;
 
 %% Initializations:
 sConfig = GetConfig();
-sConfig.sTest.vidInPath = vidInPath;
-sConfig.sTest.maxFrames = refFrame + nFramesToPlot;
-mX = LoadVideo(sConfig.sTest.vidInPath, sConfig.sTest);
+sConfig.sVidProperties.maxFrames = refFrame + nFramesToPlot;
+sConfig.sNoise.sigma = noiseSigma;
+mX = LoadVideo(vidInPath, sConfig.sVidProperties);
+mX = VideoNoise(mX, sConfig.sNoise);
 mX = single(squeeze(mX(:,:,1,:)));
 [h, w, ~] = size(mX);
 
@@ -22,10 +24,10 @@ mP =  sConfig.sBlockMatching.searchWindowP;
 mNP = sConfig.sBlockMatching.searchWindowNP;
 p =   sConfig.sBlockMatching.patchSize;
 
-%% Run BlockMatching:
+%% Run Block Matching:
 mXorig = mX;
 mPreDenoised = zeros(size(mX));
-for frame = 1:sConfig.sTest.maxFrames
+for frame = 1:sConfig.sVidProperties.maxFrames
     mX(:,:,frame) = PreprocessFrame(mX(:,:,frame));
 end
 mSkip = false([h, w]);
@@ -76,5 +78,5 @@ for iframe = 1:(nFramesToPlot-1)
     
     title(['Frame #',num2str(curFrame)]);
 end
-sgtitle(["# of Ref patches: ",num2str(size(mRefPatchInds,1))])
+sgtitle(["# of Ref Patches: ",num2str(size(mRefPatchInds,1))])
 linkaxes;
