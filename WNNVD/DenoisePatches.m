@@ -13,6 +13,9 @@ function [mY, mGroupedPixels] = DenoisePatches(mX, mNoised, mGroupIndices, vNumN
 % Output:
 %   mY -             Denoised image. [h, w, f]
 %   mGroupedPixels - 3D boolean array stating which pixles in video have been processed. [h, w, f]
+%
+% TODO:
+%   1) Process only ungrouped patches in order to save runtime?
 % --------------------------------------------------------------------------------------------------------- %
 
 if ~exist('isWaitbar', 'var') || isempty(isWaitbar)
