@@ -18,16 +18,14 @@ sConfig.sNoise.sigma = noiseSigma;
 mX = LoadVideo(vidInPath, sConfig.sVidProperties);
 mX = VideoNoise(mX, sConfig.sNoise);
 mX = single(squeeze(mX(:,:,1,:)));
-[h, w, ~] = size(mX);
+[h, w, f] = size(mX);
 
 mP =  sConfig.sBlockMatching.searchWindowP;
 mNP = sConfig.sBlockMatching.searchWindowNP;
 p =   sConfig.sBlockMatching.patchSize;
 
 %% Run Block Matching:
-mXorig = mX;
-mPreDenoised = zeros(size(mX));
-for frame = 1:sConfig.sVidProperties.maxFrames
+for frame = 1:f
     mX(:,:,frame) = PreprocessFrame(mX(:,:,frame));
 end
 mSkip = false([h, w]);

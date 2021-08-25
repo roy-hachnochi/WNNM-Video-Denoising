@@ -10,16 +10,22 @@ FACE_ALPHA =      0.3;
 nPatchesToPlot =  7;
 maxFrames =       20;
 frameToPlot =     10;
+noiseSigma =      20;
 
 %% Initializations:
 sConfig = GetConfig();
 sConfig.sVidProperties.maxFrames = maxFrames;
+sConfig.sNoise.sigma = noiseSigma;
 p = sConfig.sBlockMatching.patchSize;
 mX = LoadVideo(vidInPath, sConfig.sVidProperties);
+mX = VideoNoise(mX, sConfig.sNoise);
 mX = single(squeeze(mX(:,:,1,:)));
-[h, w, ~] = size(mX);
+[h, w, f] = size(mX);
 
 %% Run BlockMatching:
+for frame = 1:f
+    mX(:,:,frame) = PreprocessFrame(mX(:,:,frame));
+end
 mSkip = false([h, w]);
 mRefPatchInds = GetRefPatchInds(h, w, mSkip, sConfig);
 [mGroupIndices, vNumNeighbors] = BlockMatching(mX, mRefPatchInds(refPatchTestInd, :), refFrame, sConfig);
