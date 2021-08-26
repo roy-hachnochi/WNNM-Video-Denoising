@@ -2,6 +2,8 @@
 % Test for BlockMatching function
 % ========================================================================================================= %
 
+rng(42);
+
 %% Parameters:
 vidInPath =       'Videos/gbicycle.avi';
 refFrame =        10;

@@ -2,6 +2,8 @@
 % Plot an example of Block Matching between neighboring frames
 % ========================================================================================================= %
 
+rng(42);
+
 %% Parameters:
 vidInPath =       'Videos/gstennis.avi';
 refFrame =        3;
@@ -76,5 +78,4 @@ for iframe = 1:(nFramesToPlot-1)
     
     title(['Frame #',num2str(curFrame)]);
 end
-sgtitle(["# of Ref Patches: ",num2str(size(mRefPatchInds,1))])
 linkaxes;

@@ -42,7 +42,7 @@ for iRef = 1:NRefPatches
     ind = 0;
       
     % Non-predictive (exhaustive) block matching for first frame:
-    [mFirstInds, vFirstDists] = BlockMatchingNonPred(mX, vRefPatchInds, sConfig);
+    [mFirstInds, vFirstDists] = FindBlocks(mX, vRefPatchInds, vRefPatchInds, refFrame, sConfig, false);
     mSearchPatchInds(ind*k + (1:k), :) = mFirstInds;
     vSearchPatchDists(ind*k + (1:k)) =   vFirstDists;
  
@@ -50,7 +50,7 @@ for iRef = 1:NRefPatches
     mCurPatchInds = mFirstInds;
     for iFrame = refFrame+1:endFrame
         ind = ind + 1;
-        [mCurPatchInds, vCurPatchDists] = BlockMatchingPred(mX, vRefPatchInds, mCurPatchInds, iFrame, sConfig);
+        [mCurPatchInds, vCurPatchDists] = FindBlocks(mX, vRefPatchInds, mCurPatchInds, iFrame, sConfig, true);
         mSearchPatchInds(ind*k + (1:k), :) = mCurPatchInds;
         vSearchPatchDists(ind*k + (1:k)) =   vCurPatchDists;
     end
@@ -59,7 +59,7 @@ for iRef = 1:NRefPatches
     mCurPatchInds = mFirstInds;
     for iFrame = refFrame-1:-1:startFrame
         ind = ind + 1;
-        [mCurPatchInds, vCurPatchDists] = BlockMatchingPred(mX, vRefPatchInds, mCurPatchInds, iFrame, sConfig);
+        [mCurPatchInds, vCurPatchDists] = FindBlocks(mX, vRefPatchInds, mCurPatchInds, iFrame, sConfig, true);
         mSearchPatchInds(ind*k + (1:k), :) = mCurPatchInds;
         vSearchPatchDists(ind*k + (1:k)) =   vCurPatchDists;
     end
@@ -80,87 +80,35 @@ end
 end
 
 %% ==========================================================================================================
-function [mNearestInds, vNearestDists] = BlockMatchingNonPred(mX, vRefPatchInds, sConfig)
+function [mNearestInds, vNearestDists] = FindBlocks(mX, vRefPatchInds, mSearchInds, iFrame, sConfig, isPred)
 % --------------------------------------------------------------------------------------------------------- %
-% Performs non-predictive (exhaustive) block matching in a single frame. Finds nearest patches to reference
-% patch.
-%
-% Input:
-%   mX -            3D array of video frames. [h, w, f]
-%   vRefPatchInds - Array containing upper-left indices of reference patch. [3, 1]
-%   sConfig -       Struct containing all parameters for algorithm.
-%
-% Output:
-%   mNearestInds -  2D array containing upper-left indices of nearest patches. [k, 3]
-%   vNearestDists - Array distances of nearest patches from reference patch. [k, 1]
-% --------------------------------------------------------------------------------------------------------- %
-
-[h, w, ~] = size(mX);
-
-k = sConfig.sBlockMatching.maxNeighborsFrame;
-m = sConfig.sBlockMatching.searchWindowNP;
-s = sConfig.sBlockMatching.searchStrideNP;
-p = sConfig.sBlockMatching.patchSize;
-
-% extract reference inds:
-refRow =   vRefPatchInds(1);
-refCol =   vRefPatchInds(2);
-refFrame = vRefPatchInds(3);
-refIdx = sub2ind([h, w], refRow, refCol);
-
-% calculate search window:
-vStrideR = [flip(0:-s:-m), s:s:m]; % [1, n]
-vStrideC = h*[flip(0:-s:-m), s:s:m]; % [1, n]
-mWinOffsets = vStrideR' + vStrideC; % [n, n] index offset for each of the patches in the search window
-mPatchStartInds = refIdx + mWinOffsets; % [n, n]
-
-% handle out-of-boundary cases of the search window by masking patches that are out of frame:
-[mPatchStartRows, mPatchStartCols] = ind2sub([h, w], mPatchStartInds); % [n, n]
-vMaskRow = (mPatchStartRows >= 1) & (mPatchStartRows <= h - p + 1); % [n, n]
-vMaskCol = (mPatchStartCols >= 1) & (mPatchStartCols <= w - p + 1); % [n, n]
-mMask = vMaskRow & vMaskCol; % [n, n]
-vPatchStartInds = mPatchStartInds(mMask(:)); % [N, 1]
-
-% relative patch indices in frame from top-left corner:
-mSinglePatchInds = (0:p-1)' + h*(0:p-1); % [p, p]
-mSinglePatchInds = reshape(mSinglePatchInds, [1, size(mSinglePatchInds)]); % [1, p, p]
-
-% find dists:
-mRefPatch = mX(refIdx + mSinglePatchInds + (refFrame-1)*h*w); % [1, p, p]
-mPatches = mX(vPatchStartInds + repmat(mSinglePatchInds, [length(vPatchStartInds),1,1]) + (refFrame-1)*h*w);
-mDiffPatches = mPatches - mRefPatch; % [N, p, p]
-vDists = PatchesNorm(mDiffPatches, sConfig); % [N, 1]
-
-% get nearest patches:
-[vNearestDists, vNearestInds] = mink(vDists, k);
-[vRows, vCols] = ind2sub([h, w], vPatchStartInds(vNearestInds));
-mNearestInds = [vRows, vCols, repmat(refFrame, [k, 1])];
-
-end
-
-%% ==========================================================================================================
-function [mNearestInds, vNearestDists] = BlockMatchingPred(mX, vRefPatchInds, mPrevNearestInds, iFrame, sConfig)
-% --------------------------------------------------------------------------------------------------------- %
-% Performs predictive block matching in a single frame. Finds nearest patches to reference patch.
+% Performs block matching in a single frame. Finds nearest patches to reference patch.
 %
 % Input:
 %   mX -               3D array of video frames. [h, w, f]
-%   vRefPatchInds -    Array containing upper-left indices of reference patch. [3, 1]
-%   mPrevNearestInds - 2D array containing upper-left indices of previous frame's nearest patches. [k, 3]
+%   vRefPatchInds -    Array containing upper-left indices of reference patch. [1, 3]
+%   mSearchInds -      2D array containing upper-left indices to open searching window around. [k, 3]
 %   iFrame -           Current frame for search.
 %   sConfig -          Struct containing all parameters for algorithm.
+%   isPred -           Take config parameters for predictive BM (true/false).
 %
 % Output:
-%   mNearestInds -  2D array containing upper-left indices of nearest patches. [k, 3]
-%   vNearestDists - Array distances of nearest patches from reference patch. [k, 1]
+%   mNearestInds -  2D array containing upper-left indices of nearest patches. [K, 3]
+%   vNearestDists - Array distances of nearest patches from reference patch. [K, 1]
 % --------------------------------------------------------------------------------------------------------- %
 
 [h, w, ~] = size(mX);
 
-k = sConfig.sBlockMatching.maxNeighborsFrame;
-m = sConfig.sBlockMatching.searchWindowP;
-s = sConfig.sBlockMatching.searchStrideP;
+k = size(mSearchInds, 1);
+K = sConfig.sBlockMatching.maxNeighborsFrame;
 p = sConfig.sBlockMatching.patchSize;
+if isPred
+    m = sConfig.sBlockMatching.searchWindowP;
+    s = sConfig.sBlockMatching.searchStrideP;
+else
+    m = sConfig.sBlockMatching.searchWindowNP;
+    s = sConfig.sBlockMatching.searchStrideNP;
+end
 
 % extract reference patch:
 refRow =   vRefPatchInds(1);
@@ -169,21 +117,19 @@ refFrame = vRefPatchInds(3);
 refIdx = sub2ind([h, w], refRow, refCol);
 
 % calculate search windows:
-vStrideR = [flip(0:-s:-m), s:s:m]; % [1, n]
-vStrideC = h*[flip(0:-s:-m), s:s:m]; % [1, n]
-mWinOffsets = vStrideR' + vStrideC; % [n, n] index offset for each patch in the search window
-mWinOffsets = repmat(mWinOffsets, [1, 1, size(mPrevNearestInds, 1)]); % we add this to each prev nearest ind
-
-vPrevNearestInds = sub2ind([h, w], mPrevNearestInds(:, 1), mPrevNearestInds(:, 2)); % [k, 1]
-vPrevNearestInds = reshape(vPrevNearestInds, [1, 1, size(mPrevNearestInds, 1)]); % [1, 1, k]
-mPatchStartInds = vPrevNearestInds + mWinOffsets; % [n, n, k]
+vRelativeInds = [flip(0:-s:-m), s:s:m]; % [1, n]
+[mRelativeCols, mRelativeRows] = meshgrid(vRelativeInds, vRelativeInds); % [n, n]
+mPatchStartRows = reshape(mSearchInds(:, 1), [1, 1, k]) + repmat(mRelativeRows, [1, 1, k]); % [n, n, k]
+mPatchStartCols = reshape(mSearchInds(:, 2), [1, 1, k]) + repmat(mRelativeCols, [1, 1, k]); % [n, n, k]
 
 % handle out-of-boundary cases of the search window by masking patches that are out of frame:
-[mPatchStartRows, mPatchStartCols] = ind2sub([h, w], mPatchStartInds); % [n, n, k]
-vMaskRow = (mPatchStartRows >= 1) & (mPatchStartRows <= h - p + 1); % [n, n, k]
-vMaskCol = (mPatchStartCols >= 1) & (mPatchStartCols <= w - p + 1); % [n, n, k]
-mMask = vMaskRow & vMaskCol; % [n, n, k]
-vPatchStartInds = unique(mPatchStartInds(mMask(:))); % [N, 1] patches from different windows may be repeat
+mMaskRow = (mPatchStartRows >= 1) & (mPatchStartRows <= h - p + 1); % [n, n, k]
+mMaskCol = (mPatchStartCols >= 1) & (mPatchStartCols <= w - p + 1); % [n, n, k]
+mMask = mMaskRow & mMaskCol; % [n, n, k]
+vPatchStartRows = mPatchStartRows(mMask(:));
+vPatchStartCols = mPatchStartCols(mMask(:));
+vPatchStartInds = sub2ind([h, w], vPatchStartRows, vPatchStartCols);
+vPatchStartInds = unique(vPatchStartInds); % [N, 1] unique because patches from different windows may repeat
 
 % relative patch indices in frame from top-left corner:
 mSinglePatchInds = (0:p-1)' + h*(0:p-1); % [p, p]
@@ -196,9 +142,9 @@ mDiffPatches = mPatches - mRefPatch; % [N, p, p]
 vDists = PatchesNorm(mDiffPatches, sConfig); % [N, 1]
 
 % get nearest patches:
-[vNearestDists, vNearestInds] = mink(vDists, k);
+[vNearestDists, vNearestInds] = mink(vDists, K);
 [vRows, vCols] = ind2sub([h, w], vPatchStartInds(vNearestInds));
-mNearestInds = [vRows, vCols, repmat(iFrame, [k, 1])];
+mNearestInds = [vRows, vCols, repmat(iFrame, [K, 1])];
 
 end
 
