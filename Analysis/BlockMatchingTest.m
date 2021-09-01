@@ -5,14 +5,16 @@
 rng(42);
 
 %% Parameters:
-vidInPath =       'Videos/gbicycle.avi';
-refFrame =        10;
-refPatchTestInd = 2640;
+vidInPath =       fullfile('Videos','gstennis.avi');
+outFolder =       fullfile('Analysis','Figures');
+refFrame =        11;
+refPatchTestInd = 1553;
 FACE_ALPHA =      0.3;
 nPatchesToPlot =  7;
 maxFrames =       20;
 frameToPlot =     10;
 noiseSigma =      20;
+b_saveFig =       true;
 
 %% Initializations:
 sConfig = GetConfig();
@@ -34,7 +36,7 @@ mRefPatchInds = GetRefPatchInds(h, w, mSkip, sConfig);
 
 %% Plot results:
 % Display matched patches for same reference frame, and show histogram of patches per frames:
-figure;
+figure('units','normalized','outerposition',[0 0 1 1]);
 subplot(1,2,1);
 imshow(uint8(mX(:,:,frameToPlot)));   hold on;
 for iPatch = 1:vNumNeighbors(1)
@@ -53,8 +55,12 @@ xlabel('frame');    ylabel('# patches');
 title(['Number of Matched Patches Per Frame',newline,'Reference Frame: ',num2str(refFrame),newline,...
     'Total number of matched patches: ',num2str(vNumNeighbors(1))]);
 
+if b_saveFig
+    saveas(gcf, fullfile(outFolder,'BMTest_frame.png'));
+end
+
 % Plot the patches themselves:
-figure;
+figure('units','normalized','outerposition',[0 0 1 1]);
 subplot(3, nPatchesToPlot, ceil(nPatchesToPlot/2));
 refRow =   mGroupIndices(1, 1, 1);
 refCol =   mGroupIndices(1, 1, 2);
@@ -85,6 +91,9 @@ for iPlot = 1:2*nPatchesToPlot
     else
         title(sprintf('d = %.2f',dist));
     end
+end
+if b_saveFig
+    saveas(gcf, fullfile(outFolder,'BMTest_patches.png'));
 end
 
 
