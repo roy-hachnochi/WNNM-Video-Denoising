@@ -4,7 +4,7 @@
 % ========================================================================================================= %
 
 %% In/out files:
-vNoiseSigs = [10, 20, 40];
+vNoiseSigs = [10, 20, 30];
 vidNames =   {'gbicycle', 'gflower', 'gmissa', 'gsalesman', 'gstennis'};
 imNames =    {'lena'}; % just for testing WNNVD
 inDir =      'Videos';

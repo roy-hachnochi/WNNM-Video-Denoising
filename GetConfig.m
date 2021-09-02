@@ -4,7 +4,7 @@ function sConfig = GetConfig()
 % --------------------------------------------------------------------------------------------------------- %
 
 %% Input video properties:
-sConfig.sVidProperties.maxFrames = 20;   % Maximal number of frames (to reduce runtime)
+sConfig.sVidProperties.maxFrames = 60;   % Maximal number of frames (to reduce runtime)
 sConfig.sVidProperties.isGray =    true; % Use grayscale video or RGB
 
 assert(sConfig.sVidProperties.isGray, "TODO: TEMP! implement solution for RGB");
@@ -18,12 +18,12 @@ sConfig.sNoise.snp =     0; 	% Salt & pepper noise density
 sConfig.sBlockMatching.refStride =         7;    % Stride between reference pathces
 sConfig.sBlockMatching.patchSize =         8;    % Patch size
 sConfig.sBlockMatching.maxNeighborsFrame = 20;   % Maximal number of nearest neighbors per frame
-sConfig.sBlockMatching.maxGroupSize =      200;  % Maximal group size (number of patches) per reference patch
+sConfig.sBlockMatching.maxGroupSize =      150;  % Maximal group size (number of patches) per reference patch
 sConfig.sBlockMatching.searchWindowNP =    30;   % Non-predictive search window
 sConfig.sBlockMatching.searchStrideNP =    2;    % Non-predictive stride between search patches
 sConfig.sBlockMatching.searchWindowP =     5;    % Predictive search window
 sConfig.sBlockMatching.searchStrideP =     1;    % Predictive stride between search patches
-sConfig.sBlockMatching.searchWindowT =     10;   % Temporal search window (frames)
+sConfig.sBlockMatching.searchWindowT =     4;    % Temporal search window (frames)
 sConfig.sBlockMatching.metric =            'l2'; % Metric of distance between blocks ('l1' or 'l2')
 sConfig.sBlockMatching.distTh =            30;   % Threshold for maximal distance between grouped patches
 
