@@ -101,7 +101,7 @@ function [mY, mCount] = Aggregate(mY, mCount, mGroup, mGroupIndices, p)
 %   mY -            3D array of video frames. [h, w, f]
 %   mCount -        3D array of counter for grouped video pixels. [h, w, f]
 %   mGroup -        2D array containing vecotrized patches in group. [K, p^2]
-%   mGroupIndices - 2D array containing upper-left indices of patches in group. [K, 3]
+%   mGroupIndices - 2D array containing upper-  left indices of patches in group. [K, 3]
 %   p -             Patch size (single dimension).
 %
 % Output:

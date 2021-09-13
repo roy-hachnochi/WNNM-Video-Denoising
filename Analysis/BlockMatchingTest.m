@@ -87,17 +87,3 @@ for iPlot = 1:2*nPatchesToPlot
     end
 end
 
-
-%% ==========================================================================================================
-function d = PatchesNorm(mDiffPatches, sConfig)
-
-switch sConfig.sBlockMatching.metric
-    case 'l1'
-        d = mean(abs(mDiffPatches), [2, 3]);
-    case 'l2'
-        d = sqrt(mean(abs(mDiffPatches).^2, [2, 3]));
-    otherwise
-        error('Metric not defined');
-end
-
-end

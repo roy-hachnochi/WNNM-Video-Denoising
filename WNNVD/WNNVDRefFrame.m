@@ -37,15 +37,25 @@ for iter = 1:sConfig.sWNNM.nIter
         else
             mBMInput = mY;
         end
-        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
-        vNPatchesPerFrame = histcounts(mGroupIndices(:,:,3), 1:f+1) / size(mGroupIndices, 1);
+        if sConfig.sBlockMatching.trajectoryFlag
+            [mGroupIndices,mNumNeighbors] = TrajectoryMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
+            vNPatchesPerFrame = histcounts(mGroupIndices(:,:,3), 1:f+1) / size(mGroupIndices, 1);
+        else
+            [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
+            vNPatchesPerFrame = histcounts(mGroupIndices(:,:,3), 1:f+1) / size(mGroupIndices, 1);            
+        end
         
         % next iterations will have less noise - so use less patches in group:
+        % TODO : I think it should be obsolete because group size is connected mainly to the sparsity of the data and not the noise
         sConfig.sBlockMatching.maxGroupSize = max(sConfig.sBlockMatching.maxGroupSize - 10, 40);
     end
     
     % WNNM per group and image aggregation:
-    [mY, mGroupedPixelsCur] = DenoisePatches(mY, mX, mGroupIndices, vNumNeighbors, sConfig);
+    if sConfig.sBlockMatching.trajectoryFlag
+        [mY, mGroupedPixelsCur] = DenoiseTrajectories(mY, mX, mGroupIndices, mNumNeighbors, sConfig);
+    else
+        [mY, mGroupedPixelsCur] = DenoisePatches(mY, mX, mGroupIndices, vNumNeighbors, sConfig);
+    end
     
     mCountIters = mCountIters + mGroupedPixelsCur;
 end

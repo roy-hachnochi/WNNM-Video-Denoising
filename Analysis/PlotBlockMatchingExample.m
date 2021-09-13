@@ -5,7 +5,7 @@
 rng(42);
 
 %% Parameters:
-vidInPath =       'Videos/gstennis.avi';
+vidInPath =       'Videos/gbicycle.avi';
 refFrame =        3;
 refPatchTestInd = 327;
 FACE_ALPHA =      0.3;
