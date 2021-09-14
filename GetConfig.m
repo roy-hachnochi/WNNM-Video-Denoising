@@ -36,7 +36,7 @@ end
 
 %% Other algorithm params:
 sConfig.sWNNM.nIter =          8;         % Number of WNNM iterations
-sConfig.sWNNM.nFrameIter =     50;        % Maximal number of iterations on different reference frame
+sConfig.sWNNM.nFrameIter =     200;       % Maximal number of iterations on different reference frame
 sConfig.sWNNM.maxUngrouped =   0.5;       % Maximal allowed % of ungrouped pixels per frame to end algorithm
 sConfig.sWNNM.delta =          0.1;       % Iterative regularization parameter
 sConfig.sWNNM.C =              2*sqrt(2); % Weight constant

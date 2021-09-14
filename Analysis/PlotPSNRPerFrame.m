@@ -5,7 +5,7 @@
 %% Parameters:
 origFolder = 'Videos';
 vidFolder =  fullfile('Results','Clean');
-vidName =    'gbicycle';
+vidName =    'gsalesman';
 noiseStd =   20;
 outPath =    fullfile('Analysis','Figures','PSNRPerFrame.png');
 b_saveFig =  true;
@@ -19,7 +19,7 @@ mOrigVid = LoadVideo(origPath, sConfig.sVidProperties);
 [~, ~, ~, fOrig] = size(mOrigVid);
 
 %% Calculate and plot PSNRs per video:
-figure;
+figure('units','normalized','outerposition',[0 0 1 1]);
 for ind = 1:length(algs)
     vidPath = fullfile(vidFolder, [vidName,'_',algs{ind},'_',num2str(noiseStd),'.avi']);
     mVid = LoadVideo(vidPath, sConfig.sVidProperties);
@@ -36,7 +36,7 @@ end
 grid on;
 xlabel('frame');
 ylabel('PSNR');
-title('PSNR Per Frame');
+title(['PSNR Per Frame - ', vidName,', \sigma_n = ',num2str(noiseStd)]);
 legend(algs);
 
 if b_saveFig

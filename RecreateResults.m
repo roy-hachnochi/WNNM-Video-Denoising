@@ -13,9 +13,8 @@ logDir =     fullfile('Results','Logs');
 algs =       {'WNNVD', 'WNNID', 'VBM3D'};
 
 %% Initializations:
-nVids =   length(vidNames);
-nIms =    length(imNames);
-nInputs = nVids + nIms;
+nVids = length(vidNames);
+nIms =  length(imNames);
 
 sConfig = GetConfig();
 
@@ -23,16 +22,14 @@ sConfig = GetConfig();
 for noiseSig = vNoiseSigs
     for iAlg = 1:length(algs)
         if strcmp(algs{iAlg},'WNNVD') % run images only with WNNVD
-            noisedPaths = cell(1, nInputs);
-            origPaths =   cell(1, nInputs);
-            outPaths =    cell(1, nInputs);
-            logPaths =    cell(1, nInputs);
+            nInputs = nVids + nIms;
         else
-            noisedPaths =  cell(1, nVids);
-            origPaths =    cell(1, nVids);
-            outPaths =     cell(1, nVids);
-            logPaths =     cell(1, nVids);
+            nInputs = nVids;
         end
+        noisedPaths = cell(1, nInputs);
+        origPaths =   cell(1, nInputs);
+        outPaths =    cell(1, nInputs);
+        logPaths =    cell(1, nInputs);
         
         for iVid = 1:nVids
             noisedPaths{iVid} = fullfile(inDir,'Noised',[vidNames{iVid},'_',num2str(noiseSig),'.avi']);

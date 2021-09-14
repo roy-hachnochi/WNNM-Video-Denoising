@@ -3,7 +3,7 @@
 % ========================================================================================================= %
 
 %% Parameters:
-logPath =   fullfile('Results','Logs','gbicycle_WNNVD_20.mat');
+logPath =   fullfile('Results','Logs','gmissa_WNNVD_20.mat');
 outPath =   fullfile('Analysis','Figures','TimePerIt.png');
 b_saveFig = true;
 
@@ -11,7 +11,7 @@ b_saveFig = true;
 load(logPath, 'sLog');
 
 %% Plot:
-figure;
+figure('units','normalized','outerposition',[0 0 1 1]);
 yyaxis left
 plot(1:length(sLog.vTime), sLog.vTime, '*-', 'LineWidth', 2);
 ylabel('t [sec]');
