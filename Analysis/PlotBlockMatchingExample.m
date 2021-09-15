@@ -5,13 +5,15 @@
 rng(42);
 
 %% Parameters:
-vidInPath =       'Videos/gbicycle.avi';
-refFrame =        3;
-refPatchTestInd = 327;
+vidInPath =       fullfile('Videos','gbicycle.avi');
+outFolder =       fullfile('Analysis','Figures');
+refFrame =        1;
+refPatchTestInd = 2746;
 FACE_ALPHA =      0.3;
 nPatchesToPlot =  7;
-nFramesToPlot =   4;
+nFramesToPlot =   3;
 noiseSigma =      20;
+b_saveFig =       true;
 
 %% Initializations:
 sConfig = GetConfig();
@@ -36,7 +38,7 @@ mRefPatchInds = GetRefPatchInds(h, w, mSkip, sConfig);
 
 %% Plot results:
 % Display matched patches for same reference frame, and show histogram of patches per frames:
-figure;
+figure('units','normalized','outerposition',[0 0 1 1]);
 subplot(1,nFramesToPlot,1);
 imshow(uint8(mX(:,:,refFrame)));   hold on;
 % plot search window:
@@ -79,3 +81,7 @@ for iframe = 1:(nFramesToPlot-1)
     title(['Frame #',num2str(curFrame)]);
 end
 linkaxes;
+
+if b_saveFig
+    saveas(gcf, fullfile(outFolder,'BMExample'));
+end

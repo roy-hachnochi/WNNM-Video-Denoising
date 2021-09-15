@@ -10,6 +10,7 @@ vidNames =   {'gbicycle', 'gflower', 'gmissa', 'gsalesman', 'gstennis'};
 imNames =    {'lena'};
 vNoiseSigs = [10, 20, 30];
 sConfig =    GetConfig();
+sConfig.sVidProperties.maxFrames = inf;
 
 for noiseSig = vNoiseSigs
     sConfig.sNoise.sigma = noiseSig;

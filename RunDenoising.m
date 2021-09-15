@@ -93,7 +93,7 @@ end
 
 %% Prepare parameters for algs:
 if strcmp(alg, 'WNNID')
-    sConfig.sBlockMatching.searchWindowT = 0;
+    sConfig.sBlockMatching.searchWindowT = 0; % BM on one frame at a time
 end
 
 %% Run video denoising algorithm on all vids:
@@ -116,6 +116,10 @@ for iVid = 1:nVids
     
     if origExists
         assert(all(size(mX) == size(mOrigVid)), 'Noised and original videos must be of same size.');
+    end
+    
+    if (f == 1) || (sConfig.sBlockMatching.searchWindowT == 0) % allow more patches for better denoising
+        sConfig.sBlockMatching.maxNeighborsFrame = 70;
     end
 
     %% Denoise:

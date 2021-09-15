@@ -27,12 +27,12 @@ for frame = 1:f
 end
 
 %% Perform WNNVD for a single reference frame
-mY =             mX;
-mGroupedPixels = false(size(mX));
-processed =      0;
-refFrame =       ceil(f/2);
-iter =           1;
-while (iter <= sConfig.sWNNM.nFrameIter) && ((1 - processed)*100 > sConfig.sWNNM.maxUngrouped)
+mY =                 mX;
+mGroupedPixels =     false(size(mX));
+vProcessedPerFrame = zeros(f, 1);
+refFrame =           ceil(f/2);
+iter =               1;
+while (iter <= sConfig.sWNNM.nFrameIter) && any((1 - vProcessedPerFrame)*100 > sConfig.sWNNM.maxUngrouped)
     % run iteration on single reference frame:
     tStart = tic;
     [mY, mGroupedPixels, vNPatchesPerFrame] = ...
@@ -40,7 +40,8 @@ while (iter <= sConfig.sWNNM.nFrameIter) && ((1 - processed)*100 > sConfig.sWNNM
     itTime = toc(tStart);
     
     % update log:
-    processed = mean(mGroupedPixels(:));    
+    vProcessedPerFrame = squeeze(mean(mean(mGroupedPixels)));
+    processed = mean(vProcessedPerFrame);
     if saveLog
         sLog = UpdateLog(sLog, refFrame, processed, vNPatchesPerFrame, itTime);
     end
