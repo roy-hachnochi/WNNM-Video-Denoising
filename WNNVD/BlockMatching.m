@@ -65,8 +65,8 @@ for iRef = 1:NRefPatches
     end
     
     %% Find nearest patches from entire patch array:
-    [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K-1);
-    mGroupIndices(iRef, 1:min(K,(endFrame - startFrame + 1)*k+1), :) = [vRefPatchInds ;mSearchPatchInds(vNearestInds, :)];
+    [vNearestDists, vNearestInds] = mink(vSearchPatchDists, K);
+    mGroupIndices(iRef, 1:min(K,(endFrame - startFrame + 1)*k), :) = mSearchPatchInds(vNearestInds, :);
     vNumNeighbors(iRef) = sum(vNearestDists <= sConfig.sBlockMatching.distTh);
     
     if isWaitbar && (mod(iRef - 1, 20) == 0)
