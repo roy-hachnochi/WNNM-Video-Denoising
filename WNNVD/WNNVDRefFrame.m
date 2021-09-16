@@ -37,7 +37,11 @@ for iter = 1:sConfig.sWNNM.nIter
         else
             mBMInput = mY;
         end
-        [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
+        if sConfig.sTrajectoryMatching.b_apply
+            [mGroupIndices, mNumNeighbors] = TrajectoryMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);
+        else
+            [mGroupIndices, vNumNeighbors] = BlockMatching(mBMInput, mRefPatchInds, refFrame, sConfig, false);           
+        end
         vNPatchesPerFrame = histcounts(mGroupIndices(:,:,3), 1:f+1) / size(mGroupIndices, 1);
         
         % next iterations will have less noise - so use less patches in group:
@@ -45,7 +49,11 @@ for iter = 1:sConfig.sWNNM.nIter
     end
     
     % WNNM per group and image aggregation:
-    [mY, mGroupedPixelsCur] = DenoisePatches(mY, mX, mGroupIndices, vNumNeighbors, sConfig);
+    if sConfig.sTrajectoryMatching.b_apply
+        [mY, mGroupedPixelsCur] = DenoiseTrajectories(mY, mX, mGroupIndices, mNumNeighbors, sConfig);
+    else
+        [mY, mGroupedPixelsCur] = DenoisePatches(mY, mX, mGroupIndices, vNumNeighbors, sConfig);
+    end
     
     mCountIters = mCountIters + mGroupedPixelsCur;
 end

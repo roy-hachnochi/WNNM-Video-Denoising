@@ -96,17 +96,3 @@ if b_saveFig
     saveas(gcf, fullfile(outFolder,'BMTest_patches.png'));
 end
 
-
-%% ==========================================================================================================
-function d = PatchesNorm(mDiffPatches, sConfig)
-
-switch sConfig.sBlockMatching.metric
-    case 'l1'
-        d = mean(abs(mDiffPatches), [2, 3]);
-    case 'l2'
-        d = sqrt(mean(abs(mDiffPatches).^2, [2, 3]));
-    otherwise
-        error('Metric not defined');
-end
-
-end
