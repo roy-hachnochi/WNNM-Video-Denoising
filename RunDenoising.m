@@ -118,8 +118,16 @@ for iVid = 1:nVids
         assert(all(size(mX) == size(mOrigVid)), 'Noised and original videos must be of same size.');
     end
     
-    if (f == 1) || (sConfig.sBlockMatching.searchWindowT == 0) % allow more patches for better denoising
+    % adjust parameters for better denoising:
+    if sConfig.sBlockMatching.searchWindowT == 0
         sConfig.sBlockMatching.maxNeighborsFrame = 70;
+    end
+    if f == 1
+        sConfig.sBlockMatching.maxNeighborsFrame = 70;
+        sConfig.sBlockMatching.searchStrideNP =    1;
+        sConfig.sWNNM.nIter =                      12;
+        sConfig.sWNNM.BMIter =                     6;
+        sConfig.sWNNM.minIterForSkip =             12;
     end
 
     %% Denoise:
