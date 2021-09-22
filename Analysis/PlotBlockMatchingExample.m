@@ -10,7 +10,6 @@ outFolder =       fullfile('Analysis','Figures');
 refFrame =        1;
 refPatchTestInd = 2746;
 FACE_ALPHA =      0.3;
-nPatchesToPlot =  7;
 nFramesToPlot =   3;
 noiseSigma =      20;
 b_saveFig =       true;

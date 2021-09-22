@@ -1,16 +1,21 @@
 % ========================================================================================================= %
-% Plot an example denoised frames as a single image.
+% Plot an example of denoised frames as a single image.
 % ========================================================================================================= %
 
 rng(42);
 
 %% Parameters:
-vidNames = {fullfile('Results','Clean','gsalesman_WNNVD_10.avi'),...
-            fullfile('Results','Clean','gsalesman_WNNVD_20.avi'),...
-            fullfile('Results','Clean','gsalesman_WNNVD_30.avi')};
+noisedVidNames = {fullfile('Videos','Noised','gbicycle_10.avi'),...
+                  fullfile('Videos','Noised','gbicycle_20.avi'),...
+                  fullfile('Videos','Noised','gbicycle_30.avi')};
+vidNames = {fullfile('Results','Clean','gbicycle_WNNVD_10.avi'),...
+            fullfile('Results','Clean','gbicycle_WNNVD_20.avi'),...
+            fullfile('Results','Clean','gbicycle_WNNVD_30.avi')};
 outFolder = fullfile('Analysis','Figures');
-refFrame =  32;
+refFrame =  20;
 b_saveFig = true;
+
+assert(length(noisedVidNames) == length(vidNames));
 
 %% Initializations:
 sConfig = GetConfig();
@@ -19,11 +24,13 @@ sConfig.sVidProperties.maxFrames = refFrame;
 %% Run Block Matching:
 mIm = [];
 for iVid = 1:length(vidNames)
-    % Load video
+    % Load videos
     mX = LoadVideo(vidNames{iVid}, sConfig.sVidProperties);
     mX = squeeze(mX(:,:,1,refFrame));
+    mXNoised = LoadVideo(noisedVidNames{iVid}, sConfig.sVidProperties);
+    mXNoised = squeeze(mXNoised(:,:,1,refFrame));
     
-    mIm = [mIm, mX];
+    mIm = [mIm, [mXNoised; mX]]; %#ok
 end
 
 %% Plot image
